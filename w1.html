@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>第 1 周 · 路径与目录</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p><a href="index.html">← 返回主页</a></p>
+
+<h1>第 1 周 · 路径与目录</h1>
+<p class="sub">手机读，电脑练 ｜ 2026-11-09</p>
+
+<h2>一、为什么要有「路径」</h2>
+<div class="card">
+  <p>电脑里有上百万个文件。难的地方不是"打开一个文件"，是<strong>打开某一个特定的文件</strong>。</p>
+  <p>因为<strong>文件可以重名</strong>。你完全可以建 10 个都叫 <code>笔记.txt</code> 的文件，分别放在不同文件夹里。这时候你说"打开笔记.txt"，电脑不知道是哪一本。</p>
+  <p>所以光靠<strong>名字</strong>不够，还得靠<strong>位置</strong>。</p>
+</div>
+<div class="analogy">
+  <strong>一句话记住：</strong>名字可能重复，位置不会重复。<br>
+  <strong>路径就是文件的位置</strong>——用位置唯一定位一个文件。
+</div>
+
+<h2>二、路径是什么</h2>
+<div class="card">
+  <span class="tag">路径 Path</span>
+  <p><strong>路径 = 从根出发，一层一层走到目标文件的完整路线。</strong></p>
+  <p>看这个：</p>
+  <p><code>C:\Users\24281\学习\进度.md</code></p>
+  <p>从左往右读：<code>C:</code> → <code>Users</code> → <code>24281</code> → <code>学习</code> → <code>进度.md</code></p>
+</div>
+<div class="analogy">
+  就像快递地址：北京市 → 海淀区 → 中关村大街 1 号 → 302 室。少写一层，快递就送不到。
+</div>
+
+<h3>三个必须记住的词</h3>
+<table>
+  <tr><th>词</th><th>是什么</th><th>Windows</th><th>Linux</th></tr>
+  <tr><td><strong>根目录</strong></td><td>最顶层那一层</td><td><code>C:\</code></td><td><code>/</code></td></tr>
+  <tr><td><strong>分隔符</strong></td><td>层与层之间的分隔</td><td><code>\</code> 反斜杠</td><td><code>/</code> 正斜杠</td></tr>
+  <tr><td><strong>当前目录</strong></td><td>你现在"站"在哪个文件夹</td><td colspan="2">—</td></tr>
+</table>
+
+<h3>绝对路径 vs 相对路径</h3>
+<table>
+  <tr><th></th><th>从哪开始写</th><th>例子</th><th>特点</th></tr>
+  <tr><td><strong>绝对路径</strong></td><td>从<strong>根</strong></td><td><code>C:\Users\24281\学习\进度.md</code></td><td>在哪都能用</td></tr>
+  <tr><td><strong>相对路径</strong></td><td>从<strong>当前目录</strong></td><td><code>学习\进度.md</code></td><td>换个当前目录就指错</td></tr>
+</table>
+<div class="analogy">
+  绝对路径 = <strong>完整快递地址</strong>；相对路径 = "<strong>从这儿往前走两个路口</strong>"。你站在别处说这句话，别人就找不到了。
+</div>
+
+<h2>三、目录是什么</h2>
+<div class="card">
+  <p><strong>目录 = 文件夹。</strong>同一个东西的两个名字，没有区别。</p>
+  <ul>
+    <li><strong>根目录</strong>：最顶层的那个文件夹</li>
+    <li><strong>子目录</strong>：文件夹里面的文件夹（房间里的柜子）</li>
+    <li><strong>当前目录</strong>：你现在待着的那个文件夹</li>
+  </ul>
+  <p><strong>为什么"当前目录"重要？</strong>因为相对路径是<strong>相对它</strong>来算的。你站错房间，一伸手就摸错东西。</p>
+</div>
+
+<h2>四、怎么做：看到路径的三步</h2>
+<div class="card">
+  <ol>
+    <li><strong>看开头</strong> → 判断系统<br>
+      <code>C:\</code> 这种<strong>盘符 + 反斜杠</strong> → Windows；<br>
+      <code>/</code> 开头、<strong>没有盘符</strong> → Linux</li>
+    <li><strong>从左往右读</strong> → 一层一层说清每一层是什么</li>
+    <li><strong>看是不是从根开始</strong> → 判断绝对还是相对</li>
+  </ol>
+</div>
+
+<h2>五、自测（先自己想，再点开）</h2>
+
+<details>
+  <summary>1. 用一句话说，路径是什么？</summary>
+  <p>文件在电脑里的完整地址，从根一路写到文件名。</p>
+</details>
+
+<details>
+  <summary>2. 「当前目录」为什么重要？</summary>
+  <p>相对路径是相对当前目录算的。站错房间，就找不到文件。</p>
+</details>
+
+<details>
+  <summary>3. 绝对路径和相对路径，最大的区别是什么？</summary>
+  <p>绝对路径从根开始写，在哪都能用；相对路径从当前目录开始写，换个位置就指错。</p>
+</details>
+
+<details>
+  <summary>4. 看到一个路径，怎么快速判断 Windows 还是 Linux？</summary>
+  <p>看开头：盘符 + 反斜杠（<code>C:\</code>）= Windows；以正斜杠开头、没有盘符（<code>/home</code>）= Linux。</p>
+</details>
+
+<h2>六、答题区</h2>
+<p class="hint">写完点下面的按钮生成答题卡，再复制发回给 AI。答案存在你手机本地，刷新不会丢。</p>
+
+<div class="answer-box">
+  <label>Q1. 写出 <code>D:\研究生\代码\test.py</code> 的完整读法（从哪一层到哪一层）</label>
+  <textarea id="q1" placeholder="从 D: 盘开始 → ..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q2. 下面两个路径分别是哪个系统的？</label>
+  <textarea id="q2" placeholder="A. C:\Users\24281\学习 → &#10;B. /home/px4/ros2_ws → "></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q3. <code>学习\进度.md</code> 是绝对路径还是相对路径？为什么？</label>
+  <textarea id="q3" placeholder="是...，因为..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q4. 当前目录是 <code>C:\Users\24281</code> 时，<code>学习\进度.md</code> 指向的完整路径是什么？</label>
+  <textarea id="q4" placeholder="完整路径："></textarea>
+</div>
+
+<div class="answer-box">
+  <label>变式题. 为什么两个不同文件夹里可以各有一个 <code>笔记.txt</code>，电脑不会搞混？</label>
+  <textarea id="q5" placeholder="因为..."></textarea>
+</div>
+
+<div class="btn-row">
+  <button onclick="gen()">生成答题卡</button>
+  <button class="secondary" onclick="copyOut()">复制</button>
+  <button class="secondary" onclick="clearAll()">清空</button>
+</div>
+
+<textarea id="out" placeholder="点「生成答题卡」，这里会出现可以复制的文字"></textarea>
+<p class="hint" id="msg"></p>
+
+<div class="todo">
+  <h2>下一步：电脑上做</h2>
+  <p>在电脑上用终端完成三件事，<strong>命令自己敲，不要复制</strong>：</p>
+  <ul>
+    <li>进入一个指定目录</li>
+    <li>列出这个目录下有哪些文件</li>
+    <li>确认自己当前在哪个路径</li>
+  </ul>
+  <p>做的时候<strong>先猜结果，再看实际结果</strong>。对不上，就说明哪个概念还没通。</p>
+</div>
+
+<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+
+<script>
+const ids = ['q1','q2','q3','q4','q5'];
+const labels = {
+  q1: 'Q1 读法',
+  q2: 'Q2 系统判断',
+  q3: 'Q3 绝对/相对 + 理由',
+  q4: 'Q4 完整路径',
+  q5: '变式题'
+};
+
+// 恢复上次输入
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  const saved = localStorage.getItem('w1_' + id);
+  if (saved) el.value = saved;
+  el.addEventListener('input', () => localStorage.setItem('w1_' + id, el.value));
+});
+
+function gen() {
+  let text = '【第 1 周 · 路径与目录】答题卡\n\n';
+  ids.forEach(id => {
+    const v = document.getElementById(id).value.trim();
+    text += labels[id] + '：\n' + (v || '（没写）') + '\n\n';
+  });
+  const out = document.getElementById('out');
+  out.value = text;
+  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+}
+
+function copyOut() {
+  const out = document.getElementById('out');
+  if (!out.value) { gen(); }
+  const msg = document.getElementById('msg');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(out.value).then(
+      () => msg.textContent = '已复制，去对话框粘贴。',
+      () => { out.select(); msg.textContent = '请长按上面的框手动复制。'; }
+    );
+  } else {
+    out.select();
+    out.setSelectionRange(0, 99999);
+    try {
+      document.execCommand('copy');
+      msg.textContent = '已复制，去对话框粘贴。';
+    } catch (e) {
+      msg.textContent = '请长按上面的框手动复制。';
+    }
+  }
+}
+
+function clearAll() {
+  if (!confirm('清空所有答案？')) return;
+  ids.forEach(id => {
+    document.getElementById(id).value = '';
+    localStorage.removeItem('w1_' + id);
+  });
+  document.getElementById('out').value = '';
+  document.getElementById('msg').textContent = '已清空。';
+}
+</script>
+
+</body>
+</html>
