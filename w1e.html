@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>第 1 周 · 电脑实操：进目录、列文件、看路径</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p><a href="index.html">← 返回主页</a></p>
+
+<h1>第 1 周 · 电脑实操</h1>
+<p class="sub">进目录、列文件、看自己站在哪 ｜ 2026-11-13</p>
+
+<h2>一、为什么必须动手</h2>
+<div class="card">
+  <p>前面几张卡你都读过了，那只是 <strong>L2：能复述</strong>。</p>
+  <p>会飞的无人机、跑得起来的 ROS2，靠的都是 <strong>L3：能独立操作</strong>。两者的距离，就是<strong>手指头有没有真的敲过</strong>。</p>
+  <p>这一周的电脑目标只有一件事：<strong>在终端里自由地走动，并且永远知道自己在哪。</strong></p>
+</div>
+
+<h2>二、只有三条命令</h2>
+<table>
+  <tr><th>你想干什么</th><th>Windows PowerShell</th><th>cmd 命令提示符</th><th>Linux</th></tr>
+  <tr><td>我在哪？</td><td><code>pwd</code></td><td><code>cd</code></td><td><code>pwd</code></td></tr>
+  <tr><td>这里有什么？</td><td><code>ls</code> 或 <code>dir</code></td><td><code>dir</code></td><td><code>ls</code></td></tr>
+  <tr><td>去某个目录</td><td><code>cd 路径</code></td><td><code>cd 路径</code></td><td><code>cd 路径</code></td></tr>
+  <tr><td>回上一层</td><td><code>cd ..</code></td><td><code>cd ..</code></td><td><code>cd ..</code></td></tr>
+  <tr><td>回家目录</td><td><code>cd ~</code></td><td><code>cd %USERPROFILE%</code></td><td><code>cd ~</code></td></tr>
+</table>
+<div class="card">
+  <p><strong>好消息：</strong><code>cd</code> 和 <code>cd ..</code> 三个系统完全一样。你只在 Windows 上练，迁到 Linux 时这部分不用重学。</p>
+  <p><strong>注意：</strong>PowerShell 里 <code>ls</code> 和 <code>dir</code> 都能用（它是 <code>Get-ChildItem</code> 的别名）。cmd 里只有 <code>dir</code>。</p>
+</div>
+
+<h2>三、打开终端</h2>
+<div class="card">
+  <p><strong>方法一（推荐）</strong>：<code>Win + X</code> → 选「终端」或「终端(管理员)」</p>
+  <p><strong>方法二</strong>：<code>Win + R</code> → 输入 <code>powershell</code> → 回车</p>
+  <p><strong>方法三</strong>：在任意文件夹的地址栏里直接输入 <code>powershell</code> 回车 —— <strong>终端会直接开在这个文件夹里</strong>，这个技巧以后很省事。</p>
+  <p>打开后默认位置一般是 <code>C:\Users\24281</code>。</p>
+</div>
+
+<h2>四、五步走（每一步先猜，再看）</h2>
+<div class="card">
+  <ol>
+    <li><strong>看自己在哪</strong> —— 敲 <code>pwd</code>。<br><span class="hint">先猜会打印什么，再看实际结果。</span></li>
+    <li><strong>看这儿有什么</strong> —— 敲 <code>ls</code>。<br>找找有没有「学习」这个文件夹。</li>
+    <li><strong>走进去</strong> —— 敲 <code>cd 学习</code>，然后再 <code>pwd</code> 确认。<br>如果 <code>pwd</code> 变了，说明你真的进去了。</li>
+    <li><strong>再看一眼</strong> —— <code>ls</code>，找 <code>进度.md</code> 在不在。<br>在，就证明你这个"位置"是对的。</li>
+    <li><strong>退回来</strong> —— <code>cd ..</code>，再 <code>pwd</code>，应该回到 <code>C:\Users\24281</code>。</li>
+  </ol>
+</div>
+<div class="analogy">
+  <code>pwd</code> 是看路牌，<code>ls</code> 是看货架，<code>cd</code> 是走进一扇门，<code>cd ..</code> 是往回走一层。<br>
+  <strong>永远先看路牌，再走路。</strong>迷路的人都是不看路牌就开始走的。
+</div>
+
+<h2>五、Tab 补全：效率的分水岭</h2>
+<div class="card">
+  <p>敲 <code>cd 学</code>，然后按 <strong>Tab</strong> 键 —— 会自动补成 <code>cd 学习</code>。</p>
+  <p>如果补全了，说明名字对；如果没反应或补成别的，说明你打错了。这是<strong>最便宜的纠错方式</strong>。</p>
+  <p>长路径尤其有用：<code>cd C:\Users\24281\学习\site</code> 敲成 <code>cd C:\Us</code> + Tab + <code>学</code> + Tab 就行。</p>
+  <p>已经敲错一个字母，Tab 救不了你 —— 它是补全，不是纠错。但它会<strong>立刻暴露</strong>你敲错了。</p>
+</div>
+
+<h2>六、三种报错，分别说明什么</h2>
+<table>
+  <tr><th>报错</th><th>中文意思</th><th>问题出在</th></tr>
+  <tr><td><code>command not found</code></td><td>找不到这个命令</td><td>命令名打错，或这个程序不在 PATH 里</td></tr>
+  <tr><td><code>No such file or directory</code><br><code>找不到路径</code></td><td>找不到这个文件/目录</td><td><strong>路径写错了</strong>，或者你站的位置不对（相对路径）</td></tr>
+  <tr><td><code>Permission denied</code><br><code>拒绝访问</code></td><td>不让你干</td><td>权限不够，需要管理员</td></tr>
+</table>
+<div class="card">
+  <p>练的时候报错是<strong>好事</strong>。每次报错，你就知道该看哪一层：</p>
+  <p>命令找不到 → 去看 PATH<br>路径找不到 → 先去 <code>pwd</code> 看自己站哪，再用 <code>ls</code> 看目标在不在</p>
+</div>
+
+<h2>七、这一周的任务</h2>
+<div class="card">
+  <p><strong>规则：命令自己敲，不许复制粘贴。</strong>复制是练手指，不是练脑子。</p>
+  <ol>
+    <li>进到 <code>C:\Users\24281\学习</code>，确认 <code>进度.md</code> 在里面</li>
+    <li>在 <code>学习</code> 里进到 <code>site</code>，列出里面有几个 <code>.html</code> 文件</li>
+    <li>从 <code>site</code> 一路退回 <code>C:\Users\24281</code>（<strong>不许用绝对路径，只能用 <code>..</code></strong>）</li>
+    <li>跨盘：去 <code>E:\研究生\研一\学习资料\练习</code>，到了用 <code>pwd</code> 确认</li>
+    <li>回到 <code>C:\Users\24281\学习</code>，全程记录你敲了哪些命令</li>
+  </ol>
+  <p class="hint">第 3 步和第 4 步是这周的真考点：一个考"相对路径走回来"，一个考"跨盘要显式切盘"。</p>
+</div>
+
+<h2>八、答题区</h2>
+<p class="hint">做完实操再来填。把你敲的命令和你看到的结果写下来，卡住的地方也写。</p>
+
+<div class="answer-box">
+  <label>Q1. <code>pwd</code> 和 <code>ls</code> 分别回答什么问题？用你自己的话说。</label>
+  <textarea id="q1" placeholder="pwd 告诉我...，ls 告诉我..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q2. 你敲 <code>cd 学习</code> 之后，怎么"证明"自己真的进去了？（说两个办法）</label>
+  <textarea id="q2" placeholder="办法一：...&#10;办法二：..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q3. 从 <code>C:\Users\24281\学习\site</code> 退回 <code>C:\Users\24281</code>，你需要敲几次 <code>cd ..</code>？为什么？</label>
+  <textarea id="q3" placeholder="...次，因为..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q4. 你敲了 <code>cd D:\研究生</code>，报「找不到路径」。可能是哪几种原因？</label>
+  <textarea id="q4" placeholder="可能一：...&#10;可能二：..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q5（实操记录）. 贴出你实际敲的命令和结果，以及卡住的地方。</label>
+  <textarea id="q5" placeholder="我敲了：&#10;结果：&#10;卡住的地方："></textarea>
+</div>
+
+<div class="answer-box">
+  <label>变式题. 为什么 <code>cd ..</code> 在 Windows 和 Linux 里一模一样，而 <code>ls</code> 和 <code>dir</code> 不一样？</label>
+  <textarea id="q6" placeholder="..."></textarea>
+</div>
+
+<div class="btn-row">
+  <button onclick="gen()">生成答题卡</button>
+  <button class="secondary" onclick="copyOut()">复制</button>
+  <button class="secondary" onclick="clearAll()">清空</button>
+</div>
+
+<textarea id="out" placeholder="点「生成答题卡」，这里会出现可以复制的文字"></textarea>
+<p class="hint" id="msg"></p>
+
+<div class="todo">
+  <h2>做完这一周，你就有了什么</h2>
+  <ul>
+    <li>能在终端里自由走动，<strong>永远知道自己在哪</strong></li>
+    <li>看得懂 <code>C:\</code> 和 <code>/home</code> 的差别，不会再贴错路径</li>
+    <li>知道命令、程序、进程是三样东西</li>
+  </ul>
+  <p>这三条，是第 2 周「程序怎么跑起来」的地基。地基不牢，下周讲解释器你会全程懵。</p>
+</div>
+
+<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+
+<script>
+const ids = ['q1','q2','q3','q4','q5','q6'];
+const labels = {
+  q1: 'Q1 pwd vs ls',
+  q2: 'Q2 怎么证明进去了',
+  q3: 'Q3 退几层',
+  q4: 'Q4 找不到路径的原因',
+  q5: 'Q5 实操记录',
+  q6: '变式题 cd .. 为什么通用'
+};
+
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  const saved = localStorage.getItem('w1e_' + id);
+  if (saved) el.value = saved;
+  el.addEventListener('input', () => localStorage.setItem('w1e_' + id, el.value));
+});
+
+function gen() {
+  let text = '【第 1 周 · 电脑实操】答题卡\n\n';
+  ids.forEach(id => {
+    const v = document.getElementById(id).value.trim();
+    text += labels[id] + '：\n' + (v || '（没写）') + '\n\n';
+  });
+  const out = document.getElementById('out');
+  out.value = text;
+  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+}
+
+function copyOut() {
+  const out = document.getElementById('out');
+  if (!out.value) { gen(); }
+  const msg = document.getElementById('msg');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(out.value).then(
+      () => msg.textContent = '已复制，去对话框粘贴。',
+      () => { out.select(); msg.textContent = '请长按上面的框手动复制。'; }
+    );
+  } else {
+    out.select();
+    out.setSelectionRange(0, 99999);
+    try {
+      document.execCommand('copy');
+      msg.textContent = '已复制，去对话框粘贴。';
+    } catch (e) {
+      msg.textContent = '请长按上面的框手动复制。';
+    }
+  }
+}
+
+function clearAll() {
+  if (!confirm('清空所有答案？')) return;
+  ids.forEach(id => {
+    document.getElementById(id).value = '';
+    localStorage.removeItem('w1e_' + id);
+  });
+  document.getElementById('out').value = '';
+  document.getElementById('msg').textContent = '已清空。';
+}
+</script>
+
+</body>
+</html>

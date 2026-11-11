@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>第 1 周 · Windows 路径 vs Linux 路径</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p><a href="index.html">← 返回主页</a></p>
+
+<h1>第 1 周 · Windows 路径 vs Linux 路径</h1>
+<p class="sub">你现在练的全是 Windows，以后干活全在 Linux ｜ 2026-11-13</p>
+
+<h2>一、为什么非要懂这个</h2>
+<div class="card">
+  <p>PX4、ROS2、Gazebo —— <strong>全都长在 Linux 上</strong>。你迟早要进 Ubuntu。</p>
+  <p>而你现在每天练的 <code>C:\Users\24281\学习</code> 那套写法，进了 Linux <strong>一条都用不了</strong>。</p>
+  <p>更麻烦的是：两个系统都叫"路径"，长得有点像，所以你以为自己懂了，一贴进去就报 <code>No such file or directory</code>。</p>
+  <p>这张卡就是把它们摆在一起，看清楚哪里不一样。</p>
+</div>
+
+<h2>二、最根本的区别：几栋楼 vs 一棵树</h2>
+<div class="card">
+  <p><strong>Windows：每个盘是一栋独立的楼。</strong></p>
+  <p><code>C:\</code> 是一栋，<code>D:\</code> 是一栋，<code>E:\</code> 是一栋。各自有各自的根，互不相通。你要找 E 盘的东西，必须写 <code>E:\...</code>，不能从 <code>C:\</code> 一路走过去。</p>
+  <p><strong>Linux：只有一棵树。</strong></p>
+  <p>根只有一个：<code>/</code>。硬盘、U 盘、移动硬盘、网络盘，全都是<strong>挂在</strong>这棵树某个枝头上的一块地方。</p>
+</div>
+<div class="analogy">
+  Windows 像几个独立仓库，每个仓库自己编号（C 仓、D 仓），仓库之间没有门。<br>
+  Linux 像一个总仓库，<strong>只有一个大门</strong>，所有货物都从这扇门进去，分区只是"3 号货架"和"5 号货架"。<br>
+  所以 Linux 里没有"盘符"这个概念，也不需要。
+</div>
+
+<h2>三、逐项对比</h2>
+<table>
+  <tr><th>项目</th><th>Windows</th><th>Linux</th></tr>
+  <tr><td><strong>根</strong></td><td><code>C:\</code>、<code>D:\</code>…</td><td><code>/</code>（只有一个）</td></tr>
+  <tr><td><strong>分隔符</strong></td><td><code>\</code> 反斜杠</td><td><code>/</code> 正斜杠</td></tr>
+  <tr><td><strong>盘符</strong></td><td>有，字母 + 冒号</td><td><strong>没有</strong></td></tr>
+  <tr><td><strong>大小写</strong></td><td>不区分（<code>Desktop</code> = <code>desktop</code>）</td><td><strong>区分</strong>（<code>Desktop</code> ≠ <code>desktop</code>）</td></tr>
+  <tr><td><strong>家目录</strong></td><td><code>C:\Users\24281</code></td><td><code>/home/你的用户名</code>，简写 <code>~</code></td></tr>
+  <tr><td><strong>隐藏文件</strong></td><td>靠文件属性勾选</td><td>文件名以 <code>.</code> 开头就是隐藏</td></tr>
+  <tr><td><strong>空格</strong></td><td>可以有，一般加引号</td><td>可以有，但要用引号或转义</td></tr>
+</table>
+
+<div class="card">
+  <p><strong>大小写那条最容易翻车。</strong></p>
+  <p>你写 <code>import Numpy</code>，Windows 上可能还能跑，Linux 上直接报错，因为真的包叫 <code>numpy</code>。以后跑 ROS2 的时候，这种错误一找就是半小时。</p>
+</div>
+
+<h2>四、Linux 里天天见的几个符号</h2>
+<table>
+  <tr><th>符号</th><th>意思</th><th>例子</th></tr>
+  <tr><td><code>/</code></td><td>根目录，整棵树的最顶上</td><td><code>/home</code></td></tr>
+  <tr><td><code>~</code></td><td>你的家目录</td><td><code>~/ros2_ws</code> = <code>/home/你/ros2_ws</code></td></tr>
+  <tr><td><code>.</code></td><td>当前目录（就是"这儿"）</td><td><code>./run.sh</code> 运行当前目录下的脚本</td></tr>
+  <tr><td><code>..</code></td><td>上一级目录</td><td><code>cd ..</code> 退一层</td></tr>
+  <tr><td><code>-</code></td><td>上一次待的目录</td><td><code>cd -</code> 来回跳</td></tr>
+</table>
+<div class="analogy">
+  <code>.</code> 和 <code>..</code> 就像"这间屋子"和"上一层楼"。<code>~</code> 是"我家"——不管你人在哪，说"我家"都指同一个地方。
+</div>
+
+<h2>五、你这台电脑上的桥梁：WSL</h2>
+<div class="card">
+  <p>你这台机器已经装了 WSL，终端列表里那两个 <strong>Ubuntu-22.04</strong> 就是它。也就是说：<strong>不用装双系统，你现在就能开 Linux。</strong></p>
+  <p>WSL 里的 Linux 能看到 Windows 的盘，位置固定：</p>
+  <table>
+    <tr><th>Windows</th><th>WSL 里写成</th></tr>
+    <tr><td><code>C:\Users\24281\学习</code></td><td><code>/mnt/c/Users/24281/学习</code></td></tr>
+    <tr><td><code>D:\研究生</code></td><td><code>/mnt/d/研究生</code></td></tr>
+    <tr><td><code>E:\研究生</code></td><td><code>/mnt/e/研究生</code></td></tr>
+  </table>
+  <p>规律：<strong>盘符变小写、塞进 <code>/mnt/</code>、反斜杠全改成正斜杠</strong>。</p>
+</div>
+
+<h2>六、最容易踩的四个坑</h2>
+<div class="card">
+  <ol>
+    <li><strong>把 <code>C:\...</code> 原样粘进 Linux</strong> → 找不到文件。要先翻译成 <code>/mnt/c/...</code></li>
+    <li><strong>在 Linux 里写 <code>cd C:\Users</code></strong> → 反斜杠在 Linux 里是"转义符"，不是分隔符，整行意思全变</li>
+    <li><strong>大小写随手写</strong> → <code>Desktop.txt</code> 和 <code>desktop.txt</code> 在 Linux 里是两个不同文件</li>
+    <li><strong>路径里有空格不加引号</strong> → <code>cd My Folder</code> 会被当成两个参数，报"找不到 My"</li>
+  </ol>
+</div>
+
+<h2>七、自测（先自己想，再点开）</h2>
+
+<details>
+  <summary>1. 为什么 Linux 没有 C 盘、D 盘？</summary>
+  <p>因为 Linux 只有一棵树，根是 <code>/</code>。所有存储设备都是挂到这棵树的某个目录上，不需要用盘符区分。</p>
+</details>
+
+<details>
+  <summary>2. <code>~/ros2_ws/src</code> 展开成完整路径是什么？</summary>
+  <p><code>~</code> 是你的家目录，也就是 <code>/home/你的用户名</code>，所以是 <code>/home/你的用户名/ros2_ws/src</code>。</p>
+</details>
+
+<details>
+  <summary>3. 在 Windows 里写 <code>cd D:</code> 会发生什么？在 Linux 里写呢？</summary>
+  <p>两者意义不同：Windows 的 <code>D:</code> 是切到 D 盘；Linux 里根本没有 <code>D:</code> 这种东西，会当成一个不存在的目录。</p>
+</details>
+
+<details>
+  <summary>4. 为什么 Linux 对大小写这么较真？</summary>
+  <p>Linux 的文件系统（ext4 等）本身就是区分大小写的，这是设计如此，不是 bug。Python 的模块名、ROS2 的包名也都遵循这个规则。</p>
+</details>
+
+<h2>八、答题区</h2>
+<p class="hint">写完点下面的按钮生成答题卡，再复制发回给 AI。答案存在你手机本地，刷新不会丢。</p>
+
+<div class="answer-box">
+  <label>Q1. 用一句话说清：为什么 Windows 有盘符、Linux 没有？</label>
+  <textarea id="q1" placeholder="因为..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q2. 把 <code>E:\研究生\研一\学习资料\练习</code> 翻译成 WSL 里的路径</label>
+  <textarea id="q2" placeholder="/mnt/..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q3. 下面三个路径，哪些是 Linux 的？<br>A. <code>/home/px4/ros2_ws</code><br>B. <code>D:\code\test.py</code><br>C. <code>~/catkin_ws/src</code></label>
+  <textarea id="q3" placeholder="是 Linux 的有：...，因为..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q4. 你在 Linux 里敲 <code>cd C:\Users\24281</code>，为什么会失败？错在哪两层？</label>
+  <textarea id="q4" placeholder="第一错在...，第二错在..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>变式题. 如果 Linux 只有一棵树，那我插上一个 U 盘，它"长"在哪儿？</label>
+  <textarea id="q5" placeholder="..."></textarea>
+</div>
+
+<div class="btn-row">
+  <button onclick="gen()">生成答题卡</button>
+  <button class="secondary" onclick="copyOut()">复制</button>
+  <button class="secondary" onclick="clearAll()">清空</button>
+</div>
+
+<textarea id="out" placeholder="点「生成答题卡」，这里会出现可以复制的文字"></textarea>
+<p class="hint" id="msg"></p>
+
+<div class="todo">
+  <h2>下一步：亲眼看一眼 Linux</h2>
+  <p>电脑上打开 Windows Terminal，选 <strong>Ubuntu-22.04</strong> 那个标签，敲三条：</p>
+  <ul>
+    <li><code>pwd</code> —— 看你现在在树的哪个位置（应该是 <code>/home/你的用户名</code>）</li>
+    <li><code>ls /</code> —— 看树的最顶上长了哪些东西</li>
+    <li><code>ls /mnt/c/Users/24281</code> —— 看你的 Windows 家目录在 Linux 里长什么样</li>
+  </ul>
+  <p><strong>先猜结果，再看。</strong>猜错了才有收获。</p>
+</div>
+
+<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+
+<script>
+const ids = ['q1','q2','q3','q4','q5'];
+const labels = {
+  q1: 'Q1 盘符 vs 一棵树',
+  q2: 'Q2 翻译成 WSL 路径',
+  q3: 'Q3 判断哪些是 Linux',
+  q4: 'Q4 cd C:\\Users 错在哪',
+  q5: '变式题 U 盘挂在哪'
+};
+
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  const saved = localStorage.getItem('w1d_' + id);
+  if (saved) el.value = saved;
+  el.addEventListener('input', () => localStorage.setItem('w1d_' + id, el.value));
+});
+
+function gen() {
+  let text = '【第 1 周 · Windows vs Linux 路径】答题卡\n\n';
+  ids.forEach(id => {
+    const v = document.getElementById(id).value.trim();
+    text += labels[id] + '：\n' + (v || '（没写）') + '\n\n';
+  });
+  const out = document.getElementById('out');
+  out.value = text;
+  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+}
+
+function copyOut() {
+  const out = document.getElementById('out');
+  if (!out.value) { gen(); }
+  const msg = document.getElementById('msg');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(out.value).then(
+      () => msg.textContent = '已复制，去对话框粘贴。',
+      () => { out.select(); msg.textContent = '请长按上面的框手动复制。'; }
+    );
+  } else {
+    out.select();
+    out.setSelectionRange(0, 99999);
+    try {
+      document.execCommand('copy');
+      msg.textContent = '已复制，去对话框粘贴。';
+    } catch (e) {
+      msg.textContent = '请长按上面的框手动复制。';
+    }
+  }
+}
+
+function clearAll() {
+  if (!confirm('清空所有答案？')) return;
+  ids.forEach(id => {
+    document.getElementById(id).value = '';
+    localStorage.removeItem('w1d_' + id);
+  });
+  document.getElementById('out').value = '';
+  document.getElementById('msg').textContent = '已清空。';
+}
+</script>
+
+</body>
+</html>

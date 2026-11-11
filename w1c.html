@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>第 1 周 · 进程是什么</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p><a href="index.html">← 返回主页</a></p>
+
+<h1>第 1 周 · 进程是什么</h1>
+<p class="sub">程序跑起来之后，在电脑里变成了什么 ｜ 2026-11-12</p>
+
+<h2>一、为什么非要懂这个</h2>
+<div class="card">
+  <p>以后跑无人机仿真，你屏幕上会同时开三样东西：</p>
+  <ul>
+    <li><strong>PX4</strong> —— 在算飞控、算姿态</li>
+    <li><strong>Gazebo</strong> —— 在画那个三维世界</li>
+    <li><strong>YOLO 检测节点</strong> —— 在一帧一帧地看画面</li>
+  </ul>
+  <p>其中一个卡死了，你要单独把它关掉、重启，别的不能动。可任务管理器里那一列名字你一个都不认识，只能<strong>全部关掉重来</strong>——十分钟又没了。</p>
+  <p>懂进程，你才知道<strong>该杀哪一个</strong>。</p>
+</div>
+
+<h2>二、程序 ≠ 进程</h2>
+<div class="card">
+  <table>
+    <tr><th></th><th>程序 Program</th><th>进程 Process</th></tr>
+    <tr><td>在哪</td><td>硬盘上的一个文件</td><td>内存里活着的一份</td></tr>
+    <tr><td>长什么样</td><td><code>chrome.exe</code>、<code>train.py</code></td><td>任务管理器里那一行</td></tr>
+    <tr><td>不跑的时候</td><td>躺着，不占 CPU 内存</td><td>不存在</td></tr>
+    <tr><td>能有几份</td><td>就一个文件</td><td><strong>可以同时开很多份</strong></td></tr>
+  </table>
+</div>
+<div class="analogy">
+  <strong>程序 = 菜谱</strong>（印在纸上，放着不做就不产生任何东西）<br>
+  <strong>进程 = 照着菜谱真正做出来的那盘菜</strong>（占着灶台、占着食材、做完就没了）<br>
+  同一本菜谱可以做十盘菜 —— 同一个程序可以开十个进程。
+</div>
+
+<h3>一个程序开多个进程，很常见</h3>
+<div class="card">
+  <ul>
+    <li>Chrome 浏览器：<strong>每个标签页一个进程</strong>。所以一个标签崩了，别的还能用</li>
+    <li>Gazebo 你开两个窗口，任务管理器里就是两个进程</li>
+    <li>你跑两次 <code>python train.py</code>，就是两个 Python 进程在抢显卡</li>
+  </ul>
+  <p>反过来：<strong>看到三个 python.exe，不代表装了三个 Python</strong>。</p>
+</div>
+
+<h2>三、进程身上带着什么</h2>
+<table>
+  <tr><th>东西</th><th>是什么</th><th>在哪看</th></tr>
+  <tr><td><strong>PID</strong></td><td>进程的身份证号，一个数字</td><td>任务管理器 →「详细信息」那列 PID</td></tr>
+  <tr><td><strong>CPU / 内存</strong></td><td>它现在占多少资源</td><td>任务管理器主界面</td></tr>
+  <tr><td><strong>状态</strong></td><td>在跑 / 在等 / 卡死</td><td>「未响应」就是卡死</td></tr>
+  <tr><td><strong>父进程</strong></td><td>是谁把它启动的</td><td>结束父进程，子进程一般跟着死</td></tr>
+</table>
+<div class="analogy">
+  PID 就像工牌号。你要让某个工人停手，不能喊"那个工人"，得喊工号：<strong>kill 4821</strong>。
+</div>
+
+<h2>四、怎么做：看到进程</h2>
+<div class="card">
+  <p><strong>Windows 图形界面</strong>：<code>Ctrl + Shift + Esc</code> 打开任务管理器 → 点「详细信息」标签 → 有 PID 那一列。</p>
+  <p><strong>Windows 命令行</strong>：</p>
+  <p><code>tasklist</code> —— 列出所有进程</p>
+  <p><strong>Linux</strong>：</p>
+  <p><code>ps aux</code> —— 列一次；<code>top</code> —— 实时刷新</p>
+  <p><strong>结束一个进程</strong>：任务管理器里右键「结束任务」；Linux 里 <code>kill PID</code>。</p>
+</div>
+
+<h2>五、对上你的项目</h2>
+<div class="card">
+  <table>
+    <tr><th>你看到的名字</th><th>它在干什么</th><th>关了会怎样</th></tr>
+    <tr><td><code>px4</code></td><td>算飞机怎么飞</td><td>飞机掉下来，Gazebo 里模型不动了</td></tr>
+    <tr><td><code>gzserver</code> / <code>gzclient</code></td><td>仿真世界的后台 / 画面</td><td>世界没了，但 PX4 还在空转</td></tr>
+    <tr><td><code>python</code>（你的检测节点）</td><td>跑 YOLO</td><td>只有检测停，飞行不受影响</td></tr>
+  </table>
+  <p>它们之间<strong>不是互相调用</strong>，而是各自独立跑、靠<strong>话题</strong>传消息。这就是为什么能单独重启一个 —— 这也是「集群」能成立的前提。</p>
+</div>
+
+<h2>六、一个常见误解</h2>
+<div class="card">
+  <p><strong>「我把终端窗口关了，程序就停了吧？」</strong></p>
+  <p>不一定。终端只是<strong>传话窗口</strong>，进程是<strong>工人</strong>。窗口关了，工人可能还在干（尤其是后台启动的）。</p>
+  <p>反过来更常见：<strong>进程卡死了，窗口关不掉</strong>——因为窗口在等工人回话，工人不应答。这时候只能去任务管理器结束进程。</p>
+</div>
+
+<h2>七、自测（先自己想，再点开）</h2>
+
+<details>
+  <summary>1. 程序和进程，一句话区别是什么？</summary>
+  <p>程序是硬盘上的文件，进程是它跑起来之后在内存里活着的那一份。</p>
+</details>
+
+<details>
+  <summary>2. 任务管理器里有 5 个 chrome.exe，是中毒了吗？</summary>
+  <p>不是。Chrome 每个标签页、每个插件都单开一个进程。</p>
+</details>
+
+<details>
+  <summary>3. PID 是干什么用的？</summary>
+  <p>进程的身份证号，用来精确指定"要停的是哪一个"。</p>
+</details>
+
+<details>
+  <summary>4. 关掉终端窗口，里面跑的程序一定停吗？</summary>
+  <p>不一定。终端是窗口，程序是进程，两回事。</p>
+</details>
+
+<h2>八、答题区</h2>
+<p class="hint">写完点下面的按钮生成答题卡，再复制发回给 AI。答案存在你手机本地，刷新不会丢。</p>
+
+<div class="answer-box">
+  <label>Q1. 用你自己的话，说说程序和进程的区别（别说"文件"和"内存"这两个词，试着换个说法）</label>
+  <textarea id="q1" placeholder="程序就像...，进程就像..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q2. 你开了 Gazebo 和 PX4，Gazebo 卡死了，PX4 还在跑。你要关哪个？怎么确认关对了？</label>
+  <textarea id="q2" placeholder="关...，确认方法是..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q3. 为什么 Chrome 一个标签崩了，别的标签还能用？</label>
+  <textarea id="q3" placeholder="因为..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q4. 你在终端里敲了 <code>python train.py</code>，然后把终端窗口叉掉了。训练还在跑吗？为什么？</label>
+  <textarea id="q4" placeholder="..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>变式题. 如果 PID 会重复使用，为什么电脑不怕搞混？</label>
+  <textarea id="q5" placeholder="..."></textarea>
+</div>
+
+<div class="btn-row">
+  <button onclick="gen()">生成答题卡</button>
+  <button class="secondary" onclick="copyOut()">复制</button>
+  <button class="secondary" onclick="clearAll()">清空</button>
+</div>
+
+<textarea id="out" placeholder="点「生成答题卡」，这里会出现可以复制的文字"></textarea>
+<p class="hint" id="msg"></p>
+
+<div class="todo">
+  <h2>下一步：电脑上看一眼</h2>
+  <p>做完题，去电脑上做一件事（不用敲命令，看就行）：</p>
+  <ul>
+    <li>按 <code>Ctrl + Shift + Esc</code> 打开任务管理器</li>
+    <li>点「详细信息」，找到 PID 那一列</li>
+    <li>按内存排序，看看现在吃内存最多的是谁</li>
+  </ul>
+  <p>这一步只是让你把「进程」这个词和屏幕上的东西对上号。</p>
+</div>
+
+<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+
+<script>
+const ids = ['q1','q2','q3','q4','q5'];
+const labels = {
+  q1: 'Q1 程序 vs 进程',
+  q2: 'Q2 关哪个',
+  q3: 'Q3 Chrome 多进程',
+  q4: 'Q4 关窗口后还在跑吗',
+  q5: '变式题 PID 复用'
+};
+
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  const saved = localStorage.getItem('w1c_' + id);
+  if (saved) el.value = saved;
+  el.addEventListener('input', () => localStorage.setItem('w1c_' + id, el.value));
+});
+
+function gen() {
+  let text = '【第 1 周 · 进程是什么】答题卡\n\n';
+  ids.forEach(id => {
+    const v = document.getElementById(id).value.trim();
+    text += labels[id] + '：\n' + (v || '（没写）') + '\n\n';
+  });
+  const out = document.getElementById('out');
+  out.value = text;
+  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+}
+
+function copyOut() {
+  const out = document.getElementById('out');
+  if (!out.value) { gen(); }
+  const msg = document.getElementById('msg');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(out.value).then(
+      () => msg.textContent = '已复制，去对话框粘贴。',
+      () => { out.select(); msg.textContent = '请长按上面的框手动复制。'; }
+    );
+  } else {
+    out.select();
+    out.setSelectionRange(0, 99999);
+    try {
+      document.execCommand('copy');
+      msg.textContent = '已复制，去对话框粘贴。';
+    } catch (e) {
+      msg.textContent = '请长按上面的框手动复制。';
+    }
+  }
+}
+
+function clearAll() {
+  if (!confirm('清空所有答案？')) return;
+  ids.forEach(id => {
+    document.getElementById(id).value = '';
+    localStorage.removeItem('w1c_' + id);
+  });
+  document.getElementById('out').value = '';
+  document.getElementById('msg').textContent = '已清空。';
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>第 1 周 · 复盘与综合测验</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p><a href="index.html">← 返回主页</a></p>
+
+<h1>第 1 周 · 复盘</h1>
+<p class="sub">把五张卡串成一条线 ｜ 2026-11-14</p>
+
+<h2>一、一张图串起来</h2>
+<div class="card">
+  <p>这一周你学了五个词，它们不是并列的，是<strong>一条链</strong>：</p>
+  <p style="line-height:2.2;text-align:center">
+    <strong>路径</strong> → 定位一个文件<br>
+    ↓<br>
+    <strong>目录</strong> → 文件住在哪一格<br>
+    ↓<br>
+    <strong>当前目录</strong> → 你现在站在哪一格<br>
+    ↓<br>
+    <strong>命令</strong> → 你让 shell 替你干活<br>
+    ↓<br>
+    <strong>进程</strong> → 真正动手的那个工人
+  </p>
+  <p>再横着切一刀：<strong>Windows 用盘符，Linux 用一棵树</strong>。同一件事，两套写法。</p>
+</div>
+
+<h2>二、五句话总结</h2>
+<div class="card">
+  <ol>
+    <li><strong>名字会重，位置不会重</strong> —— 所以需要路径</li>
+    <li><strong>绝对从根写，相对从脚下写</strong> —— 站错位置，相对路径就指错</li>
+    <li><strong>终端传话、shell 找路、进程干活</strong> —— 一条命令的三个角色</li>
+    <li><strong>Windows 几栋楼，Linux 一棵树</strong> —— 盘符 vs <code>/</code></li>
+    <li><strong>程序是菜谱，进程是做出来的菜</strong> —— 一个程序可以开很多份</li>
+  </ol>
+</div>
+
+<h2>三、综合测验</h2>
+<p class="hint">这些题故意混着考，用来检查你是"背下来了"还是"真串起来了"。答不上来就先别翻前面的卡，想三分钟再看。</p>
+
+<div class="answer-box">
+  <label>Q1. 下面两个路径分别属于哪个系统？各自从哪一层开始读？<br>A. <code>/home/px4/PX4-Autopilot</code><br>B. <code>E:\研究生\研一\学习资料\练习</code></label>
+  <textarea id="q1" placeholder="A 是...，从...开始&#10;B 是...，从...开始"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q2. 你在终端敲 <code>python 进度.md</code>，报 <code>No such file or directory</code>。用"四步"分析：断在第几步？最可能的原因是什么？</label>
+  <textarea id="q2" placeholder="断在第...步，因为..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q3. 任务管理器里看到三个 <code>python.exe</code>。可能是什么情况？（说出两种）</label>
+  <textarea id="q3" placeholder="可能一：...&#10;可能二：..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q4. 当前目录是 <code>C:\Users\24281\学习</code>，<code>..\..\Windows</code> 指向哪里？</label>
+  <textarea id="q4" placeholder="..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q5. 把 <code>C:\Users\24281\学习\进度.md</code> 翻译成 WSL 里的路径。再说一句：为什么盘符要变？</label>
+  <textarea id="q5" placeholder="翻译：...&#10;因为：..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q6（口述题）. 用 60 秒说清"一条命令从敲下回车到屏幕出结果，中间发生了什么"。先写在下面，再对着念一遍计时。</label>
+  <textarea id="q6" placeholder="要点：..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>变式题. 这周学的五个词（路径/目录/当前目录/命令/进程），如果只能留一个，你留哪个？为什么？</label>
+  <textarea id="q7" placeholder="我留...，因为..."></textarea>
+</div>
+
+<div class="btn-row">
+  <button onclick="gen()">生成答题卡</button>
+  <button class="secondary" onclick="copyOut()">复制</button>
+  <button class="secondary" onclick="clearAll()">清空</button>
+</div>
+
+<textarea id="out" placeholder="点「生成答题卡」，这里会出现可以复制的文字"></textarea>
+<p class="hint" id="msg"></p>
+
+<h2>四、过线的标准</h2>
+<div class="card">
+  <p><strong>能独立做到下面三件事，才算第 1 周过关：</strong></p>
+  <ol>
+    <li>给你一个路径，你能说出它是哪个系统、绝对还是相对</li>
+    <li>终端里给你一个目标目录，你能自己走过去并确认到了</li>
+    <li>屏幕上出现一条报错，你能说出它断在"找命令 / 找文件 / 权限"哪一层</li>
+  </ol>
+  <p>做不到第 2 条，就别进第 2 周 —— 第 2 周讲"程序怎么跑起来"，全程要在终端里操作。</p>
+</div>
+
+<div class="todo">
+  <h2>下周预告：程序怎么跑起来</h2>
+  <p>第 2 周只有一个问题：<strong>你写的 <code>.py</code> 文件，是怎么变成屏幕上那些字的？</strong></p>
+  <p>答案是中间站着一个叫<strong>解释器</strong>的东西。你会第一次看清：源码 → 解释器 → 进程这条线，以及为什么"装了 Python 却跑不了 python"是常见病。</p>
+</div>
+
+<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+
+<script>
+const ids = ['q1','q2','q3','q4','q5','q6','q7'];
+const labels = {
+  q1: 'Q1 两个路径判断',
+  q2: 'Q2 报错断在哪一步',
+  q3: 'Q3 三个 python.exe',
+  q4: 'Q4 ..\\..\\Windows',
+  q5: 'Q5 翻译成 WSL 路径',
+  q6: 'Q6 口述：一条命令怎么跑',
+  q7: '变式题 只留一个词'
+};
+
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  const saved = localStorage.getItem('w1z_' + id);
+  if (saved) el.value = saved;
+  el.addEventListener('input', () => localStorage.setItem('w1z_' + id, el.value));
+});
+
+function gen() {
+  let text = '【第 1 周 · 复盘综合测验】答题卡\n\n';
+  ids.forEach(id => {
+    const v = document.getElementById(id).value.trim();
+    text += labels[id] + '：\n' + (v || '（没写）') + '\n\n';
+  });
+  const out = document.getElementById('out');
+  out.value = text;
+  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+}
+
+function copyOut() {
+  const out = document.getElementById('out');
+  if (!out.value) { gen(); }
+  const msg = document.getElementById('msg');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(out.value).then(
+      () => msg.textContent = '已复制，去对话框粘贴。',
+      () => { out.select(); msg.textContent = '请长按上面的框手动复制。'; }
+    );
+  } else {
+    out.select();
+    out.setSelectionRange(0, 99999);
+    try {
+      document.execCommand('copy');
+      msg.textContent = '已复制，去对话框粘贴。';
+    } catch (e) {
+      msg.textContent = '请长按上面的框手动复制。';
+    }
+  }
+}
+
+function clearAll() {
+  if (!confirm('清空所有答案？')) return;
+  ids.forEach(id => {
+    document.getElementById(id).value = '';
+    localStorage.removeItem('w1z_' + id);
+  });
+  document.getElementById('out').value = '';
+  document.getElementById('msg').textContent = '已清空。';
+}
+</script>
+
+</body>
+</html>
