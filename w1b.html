@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>第 1 周补充 · 一条命令怎么跑</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<p><a href="index.html">← 返回主页</a></p>
+
+<h1>第 1 周补充 · 一条命令怎么跑</h1>
+<p class="sub">把「路径 / 目录」和「进程」连起来的那根线 ｜ 2026-11-11</p>
+
+<h2>一、为什么非要懂这个</h2>
+<div class="card">
+  <p>你在终端敲 <code>ls</code>，屏幕就吐出一屏文件名。看起来是一瞬间的事，其实中间发生了四件事。</p>
+  <p>不懂这四件事，以后你装 PX4、跑 ROS2，屏幕上蹦出下面这些字，你只能干瞪眼：</p>
+  <ul>
+    <li><code>command not found</code> —— 命令找不到</li>
+    <li><code>No such file or directory</code> —— 文件找不到</li>
+    <li><code>Permission denied</code> —— 不让你干</li>
+  </ul>
+  <p>这三句话，是四步里<strong>不同步骤</strong>断掉时说的话。知道断在哪一步，才知道该改什么。</p>
+</div>
+
+<h2>二、三个角色</h2>
+<div class="card">
+  <table>
+    <tr><th>角色</th><th>是谁</th><th>只干一件事</th></tr>
+    <tr><td><strong>终端</strong><br>Terminal</td><td>你敲字的那个黑窗口</td><td>收你敲的字、把结果打出来。<strong>它自己不懂命令</strong></td></tr>
+    <tr><td><strong>Shell</strong><br>命令解释器</td><td>Windows：<code>cmd</code> / <code>PowerShell</code><br>Linux：<code>bash</code></td><td>看懂你写的那行字，负责<strong>找到</strong>该跑的程序</td></tr>
+    <tr><td><strong>进程</strong><br>Process</td><td>真的在跑的那个程序</td><td>干活。干完就消失</td></tr>
+  </table>
+</div>
+<div class="analogy">
+  终端 = <strong>传话窗口</strong>；Shell = <strong>管家</strong>；进程 = <strong>工人</strong>。<br>
+  你递一张纸条给管家，写「拿锤子 钉子」。管家负责去工具箱找到锤子，再叫一个工人去砸。工人干完活走人，钉子盒还在原地。
+</div>
+
+<h2>三、四步</h2>
+<div class="card">
+  <ol>
+    <li><strong>你按回车</strong> → 终端把这一整行字交给 shell。</li>
+    <li><strong>shell 拆词</strong> → 把第一个词当「程序名」，去 <code>PATH</code> 里列的目录中<strong>挨个找</strong>；找到就停，不再往下找。</li>
+    <li><strong>系统建进程</strong> → 找到后，操作系统新开一个进程，把后面的词当「参数」交给它。</li>
+    <li><strong>干活并回话</strong> → 进程运行，把结果写到屏幕；结束时进程消失。</li>
+  </ol>
+  <p><strong>PATH 是什么？</strong>一张「程序搜索目录清单」。shell 只在这几个目录里找可执行文件。不在清单里的程序，就得写全路径才叫得动它。</p>
+</div>
+
+<h2>四、最关键的一条区分</h2>
+<div class="card">
+  <p><strong>命令 = 程序名 + 参数。</strong>这两半是按<strong>完全不同的规矩</strong>找的：</p>
+  <table>
+    <tr><th></th><th>怎么找</th><th>例子</th></tr>
+    <tr><td><strong>第一个词</strong>（程序名）</td><td>靠 <code>PATH</code> 清单找</td><td><code>ls</code>、<code>python</code></td></tr>
+    <tr><td><strong>后面的词</strong>（参数）</td><td>靠<strong>当前目录</strong>或你写的路径找</td><td><code>进度.md</code>、<code>D:\code\a.py</code></td></tr>
+  </table>
+  <p>这就解释了两件你迟早会撞上的事：</p>
+  <ul>
+    <li><code>ls</code> 在<strong>哪个目录下敲都能用</strong>——因为它在 PATH 里，跟你在哪无关。</li>
+    <li><code>python 进度.md</code> 却要求 <code>进度.md</code> <strong>相对当前目录写对</strong>——因为它是参数，靠当前目录算。</li>
+  </ul>
+</div>
+<div class="analogy">
+  <strong>一句话：</strong>程序名靠「通讯录」找，参数靠「你现在站哪儿」找。<br>
+  这就是上一张卡片里「当前目录」为什么那么重要的真正原因。
+</div>
+
+<h2>五、怎么做：验证一个程序在哪</h2>
+<div class="card">
+  <p>想确认 shell 是从哪找到某个程序的，直接问它：</p>
+  <table>
+    <tr><th>系统</th><th>查程序位置</th><th>看 PATH 清单</th></tr>
+    <tr><td>Windows</td><td><code>where python</code></td><td><code>echo %PATH%</code></td></tr>
+    <tr><td>Linux</td><td><code>which python3</code></td><td><code>echo $PATH</code></td></tr>
+  </table>
+  <p>打印出来的那一串目录，就是 shell 找程序时会去翻的抽屉。</p>
+</div>
+
+<h2>六、自测（先自己想，再点开）</h2>
+
+<details>
+  <summary>1. 终端和 shell 有什么区别？</summary>
+  <p>终端只负责收字、显示字，它不懂命令；shell 才负责看懂那行字、找到该跑的程序。</p>
+</details>
+
+<details>
+  <summary>2. PATH 是什么？为什么它能让 <code>ls</code> 到处都能用？</summary>
+  <p>PATH 是 shell 搜程序的目录清单。<code>ls</code> 在本机某个 PATH 目录里，shell 每次都能翻到它，所以跟你在哪个目录无关。</p>
+</details>
+
+<details>
+  <summary>3. 报 <code>command not found</code>，断在第几步？</summary>
+  <p>第 2 步：shell 在 PATH 里翻遍了也没找到这个程序，根本没到"建进程"那一步。</p>
+</details>
+
+<details>
+  <summary>4. 报 <code>No such file or directory</code>，断在第几步？</summary>
+  <p>通常在第 3 步之后：程序找到了、也跑起来了，但它按你给的路径（参数）去开文件，发现没有这个文件。</p>
+</details>
+
+<h2>七、答题区</h2>
+<p class="hint">写完点下面的按钮生成答题卡，再复制发回给 AI。答案存在你手机本地，刷新不会丢。</p>
+
+<div class="answer-box">
+  <label>Q1. 一条命令从按回车到屏幕出结果，经过哪三个角色？各干什么？</label>
+  <textarea id="q1" placeholder="终端… / shell… / 进程…"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q2. 为什么 <code>ls</code> 在哪个目录下都能用，而 <code>python 进度.md</code> 里的 <code>进度.md</code> 必须写对位置？</label>
+  <textarea id="q2" placeholder="因为第一个词…，第二个词…"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q3. <code>where python</code> 里，第一个词和第二个词分别是什么角色？</label>
+  <textarea id="q3" placeholder="第一个词是…，第二个词是…"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q4. 敲一个压根不存在的命令，报错发生在四步里的哪一步？为什么？</label>
+  <textarea id="q4" placeholder="第…步，因为…"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>变式题. 如果两个 PATH 目录里各有一个同名的程序，shell 会跑哪个？为什么？</label>
+  <textarea id="q5" placeholder="会跑…，因为…"></textarea>
+</div>
+
+<div class="btn-row">
+  <button onclick="gen()">生成答题卡</button>
+  <button class="secondary" onclick="copyOut()">复制</button>
+  <button class="secondary" onclick="clearAll()">清空</button>
+</div>
+
+<textarea id="out" placeholder="点「生成答题卡」，这里会出现可以复制的文字"></textarea>
+<p class="hint" id="msg"></p>
+
+<div class="todo">
+  <h2>下一步：电脑上做</h2>
+  <p>只做一件事，命令自己敲，<strong>先猜再敲</strong>：</p>
+  <ul>
+    <li>查一下 <code>python</code> 到底住在哪个目录（Windows 用 <code>where python</code>）</li>
+    <li>敲之前先猜：它打印出来的路径，会不会在你当前目录里？</li>
+    <li>如果 <code>where</code> 说找不到，别急着重装，先想：是没装，还是没进 PATH？</li>
+  </ul>
+</div>
+
+<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+
+<script>
+const ids = ['q1','q2','q3','q4','q5'];
+const labels = {
+  q1: 'Q1 三个角色',
+  q2: 'Q2 程序名 vs 参数',
+  q3: 'Q3 where python 拆词',
+  q4: 'Q4 报错断在哪一步',
+  q5: '变式题'
+};
+
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  const saved = localStorage.getItem('w1b_' + id);
+  if (saved) el.value = saved;
+  el.addEventListener('input', () => localStorage.setItem('w1b_' + id, el.value));
+});
+
+function gen() {
+  let text = '【第 1 周补充 · 一条命令怎么跑】答题卡\n\n';
+  ids.forEach(id => {
+    const v = document.getElementById(id).value.trim();
+    text += labels[id] + '：\n' + (v || '（没写）') + '\n\n';
+  });
+  const out = document.getElementById('out');
+  out.value = text;
+  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+}
+
+function copyOut() {
+  const out = document.getElementById('out');
+  if (!out.value) { gen(); }
+  const msg = document.getElementById('msg');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(out.value).then(
+      () => msg.textContent = '已复制，去对话框粘贴。',
+      () => { out.select(); msg.textContent = '请长按上面的框手动复制。'; }
+    );
+  } else {
+    out.select();
+    out.setSelectionRange(0, 99999);
+    try {
+      document.execCommand('copy');
+      msg.textContent = '已复制，去对话框粘贴。';
+    } catch (e) {
+      msg.textContent = '请长按上面的框手动复制。';
+    }
+  }
+}
+
+function clearAll() {
+  if (!confirm('清空所有答案？')) return;
+  ids.forEach(id => {
+    document.getElementById(id).value = '';
+    localStorage.removeItem('w1b_' + id);
+  });
+  document.getElementById('out').value = '';
+  document.getElementById('msg').textContent = '已清空。';
+}
+
+</script>
+
+</body>
+</html>
