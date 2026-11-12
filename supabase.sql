@@ -35,9 +35,7 @@ create policy "anon can insert"
 -- → 匿名用户读不到、改不了、删不了
 -- → 只有 service_role key（存在你电脑上）能读
 
--- 给 service_role 一个便捷视图：最近 20 条
-create or replace view public.recent_answers as
-select id, created_at, card, week, body
-from public.answers
-order by created_at desc
-limit 20;
+-- 不建视图。
+-- 原因：Postgres 的视图默认以"创建者权限"运行，而创建者是超级用户，
+-- 匿名用户查视图时会绕过 RLS，等于把"只写不读"废掉。
+-- 读取统一走 service_role key 直接查表（tools/read_answers.py），不需要视图。
