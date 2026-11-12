@@ -101,7 +101,7 @@
 
   var btn = document.createElement('button');
   btn.textContent = '提交到云端';
-  btn.style.background = '#2f9e44';
+  btn.className = 'cloud';
   btn.addEventListener('click', submit);
 
   var row = document.querySelector('.btn-row');
