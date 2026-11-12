@@ -1,12 +1,12 @@
 // ============================================================
 // Supabase 配置
-// 在 Supabase 项目里：Settings → API Keys → 复制 Project URL 和 anon/public key
-// 填好这两行，网页上的「提交到云端」按钮才会出现。
+// 项目：learn（ref: tajfkquemrkjmvbqdeya）
 //
-// ⚠️ 千万不要把 service_role key 填在这里 —— 那个只放在电脑本地。
+// ⚠️ 这里只能放 publishable / anon 这种"公开也安全"的钥匙。
+//    secret / service_role 那把只放在电脑本地 tools/supabase.env。
 // ============================================================
 window.SB = {
-  url: 'https://xxxxxxxxxxxx.supabase.co',
-  anonKey: 'FILL_ME_IN',
+  url: 'https://tajfkquemrkjmvbqdeya.supabase.co',
+  anonKey: 'sb_publishable_T5Dq2RKwXmAmoREOmvAo6A_QrbNL80D',
   week: '第1周'
 };
