@@ -14,7 +14,7 @@
 </header>
 
 <h1>第 1 周 · 进程是什么</h1>
-<p class="sub">程序跑起来之后，在电脑里变成了什么 ｜ 2026-11-12</p>
+<p class="sub">程序跑起来之后，在电脑里变成了什么 ｜ 11/18 · 第 3 张</p>
 
 <h2>一、为什么非要懂这个</h2>
 <div class="card">
@@ -94,7 +94,41 @@
   <p>反过来更常见：<strong>进程卡死了，窗口关不掉</strong>——因为窗口在等工人回话，工人不应答。这时候只能去任务管理器结束进程。</p>
 </div>
 
-<h2>七、自测（先自己想，再点开）</h2>
+<h2>七、进程怎么跟外界说话——端口</h2>
+<div class="card">
+  <p>你电脑上同时跑着几十上百个进程，还有一大堆程序在往网络里收东西。那一条消息<strong>怎么才能送到对的那个进程</strong>手上？</p>
+  <p>靠<strong>端口（port）</strong>：一个 0 到 65535 的数字。进程启动时向系统<strong>申请</strong>一个端口，之后别人用「地址 + 端口」就能找到它。</p>
+  <p><code>127.0.0.1:8080</code> 的意思是：本机（<code>127.0.0.1</code>）的 8080 号端口。</p>
+</div>
+<div class="analogy">
+  IP 地址是<strong>一栋楼</strong>，端口是<strong>房间号</strong>。<br>
+  只知道楼号，快递员只能把东西扔在大厅；写上房间号，才能送到具体那间。
+</div>
+<div class="card">
+  <p><strong>你会撞上的第一个报错：</strong><code>Address already in use</code>（端口已被占用）。</p>
+  <p>原因几乎总是同一个：<strong>上一个进程没死干净</strong>，端口还被它占着。解决办法不是重启电脑，是找到那个进程杀掉。</p>
+  <table>
+    <tr><th>系统</th><th>查谁占了端口</th></tr>
+    <tr><td>Windows</td><td><code>netstat -ano | findstr :8080</code></td></tr>
+    <tr><td>Linux</td><td><code>ss -tlnp</code> 或 <code>lsof -i:8080</code></td></tr>
+  </table>
+  <p><strong>和上一节连起来看：</strong>查出来的那个数字就是 PID，拿它去 <code>kill</code>。进程、PID、端口，三样东西在这里接上了。</p>
+</div>
+
+<h2>八、以后在无人机里怎么用</h2>
+<div class="card">
+  <table>
+    <tr><th>以后你会碰到的</th><th>今天对应的概念</th></tr>
+    <tr><td>一个终端里 PX4、Gazebo、三个检测节点同时在跑</td><td>程序 vs 进程、PID</td></tr>
+    <tr><td>Gazebo 卡死，只关它、不关 PX4</td><td>每个节点是独立进程</td></tr>
+    <tr><td>起仿真时报 <code>Address already in use</code></td><td>端口</td></tr>
+    <tr><td>浏览器打开 <code>localhost:8080</code> 看 Gazebo 画面</td><td>IP + 端口</td></tr>
+    <tr><td><code>ros2 node list</code> 看到一堆节点名</td><td>进程的另一种叫法</td></tr>
+  </table>
+  <p><strong>为什么要现在懂：</strong>以后仿真起不来，十次里有三次是「有个旧进程还赖在那儿」。会看进程和端口，你自己三分钟能解决；不会，就得重启电脑碰运气。</p>
+</div>
+
+<h2>九、自测（先自己想，再点开）</h2>
 
 <details>
   <summary>1. 程序和进程，一句话区别是什么？</summary>
@@ -116,8 +150,18 @@
   <p>不一定。终端是窗口，程序是进程，两回事。</p>
 </details>
 
-<h2>八、答题区</h2>
-<p class="hint">写完点下面的按钮生成答题卡，再复制发回给 AI。答案存在你手机本地，刷新不会丢。</p>
+<details>
+  <summary>5. 端口是什么？为什么光有 IP 地址不够？</summary>
+  <p>端口是进程向系统申请的房间号。一台电脑上同时有很多程序在收发数据，光有楼号（IP）分不清该交给谁。</p>
+</details>
+
+<details>
+  <summary>6. 报 <code>Address already in use</code>，第一步该干什么？</summary>
+  <p>别重启电脑。先查是谁占着这个端口（<code>netstat -ano | findstr :端口号</code>），拿到 PID，把那个进程结束掉。</p>
+</details>
+
+<h2>十、答题区</h2>
+<p class="hint">写完点 <strong>「提交到云端」</strong>，下次开课我直接读。提交不了再点「复制」贴回对话框。答案同时存在你手机本地，刷新不会丢。</p>
 
 <div class="answer-box">
   <label>Q1. 用你自己的话，说说程序和进程的区别（别说"文件"和"内存"这两个词，试着换个说法）</label>
@@ -144,6 +188,11 @@
   <textarea id="q5" placeholder="..."></textarea>
 </div>
 
+<div class="answer-box">
+  <label>Q5. 你启动仿真，报 <code>Address already in use</code>。写出你会用哪两步解决（查什么 → 然后干什么）。</label>
+  <textarea id="q6" placeholder="先用…查到…，再…"></textarea>
+</div>
+
 <div class="btn-row">
   <button onclick="gen()">生成答题卡</button>
   <button class="secondary" onclick="copyOut()">复制</button>
@@ -164,16 +213,17 @@
   <p>这一步只是让你把「进程」这个词和屏幕上的东西对上号。</p>
 </div>
 
-<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+<p class="foot">答完提交，这张就算过。没提交 = 没答。</p>
 
 <script>
-const ids = ['q1','q2','q3','q4','q5'];
+const ids = ['q1','q2','q3','q4','q5','q6'];
 const labels = {
   q1: 'Q1 程序 vs 进程',
   q2: 'Q2 关哪个',
   q3: 'Q3 Chrome 多进程',
   q4: 'Q4 关窗口后还在跑吗',
-  q5: '变式题 PID 复用'
+  q5: '变式题 PID 复用',
+  q6: 'Q5 端口被占用'
 };
 
 ids.forEach(id => {
@@ -191,7 +241,7 @@ function gen() {
   });
   const out = document.getElementById('out');
   out.value = text;
-  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+  document.getElementById('msg').textContent = '已生成，点「提交到云端」；不行再点「复制」。';
 }
 
 function copyOut() {

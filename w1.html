@@ -14,7 +14,7 @@
 </header>
 
 <h1>第 1 周 · 路径与目录</h1>
-<p class="sub">手机读，电脑练 ｜ 2026-11-09</p>
+<p class="sub">手机读，电脑练 ｜ 11/16 开课 · 第 1 张</p>
 
 <h2>一、为什么要有「路径」</h2>
 <div class="card">
@@ -79,7 +79,38 @@
   </ol>
 </div>
 
-<h2>五、自测（先自己想，再点开）</h2>
+<h2>五、扩展名不是身份证</h2>
+<div class="card">
+  <p>你双击一个文件，电脑凭什么知道该用哪个程序打开它？</p>
+  <p>靠<strong>扩展名</strong>——文件名里最后一个点后面那一截。<code>进度.md</code> 的扩展名是 <code>md</code>，所以用编辑器打开；<code>test.py</code> 是 <code>py</code>，所以用 Python 跑。</p>
+  <p><strong>关键在这：扩展名只是名字的一部分，不是文件的身份证。</strong>文件内容是一堆二进制，扩展名只是给人看的一个标签。</p>
+</div>
+<div class="analogy">
+  扩展名像<strong>快递箱子外面贴的标签</strong>：写着"易碎品"，箱子里装的也可能是书。<br>
+  标签可以贴错——所以<strong>把 <code>a.txt</code> 改名成 <code>a.jpg</code>，它不会变成图片</strong>，只是画图软件打不开了。
+</div>
+
+<h3>一个真实的坑</h3>
+<div class="card">
+  <p>Windows 默认<strong>隐藏已知类型的扩展名</strong>。于是 <code>报销单.docx.exe</code> 在你眼里显示成 <code>报销单.docx</code>——图标还是 Word 的。</p>
+  <p>你双击，运行的不是文档，是那个 <code>.exe</code>。</p>
+  <p><strong>怎么做：</strong>资源管理器 → 顶部「查看」→ 勾选「文件扩展名」。（Win11 在「查看 → 显示 → 文件扩展名」）</p>
+</div>
+
+<h2>六、以后在无人机里怎么用</h2>
+<div class="card">
+  <p>这一周的东西看着像"电脑常识"，但它其实是后面所有事的<strong>地基</strong>：</p>
+  <table>
+    <tr><th>以后你会碰到的</th><th>这一周对应的概念</th></tr>
+    <tr><td><code>/home/你/ros2_ws/src</code> —— 你每天 <code>cd</code> 的地方</td><td>绝对路径、家目录 <code>~</code></td></tr>
+    <tr><td><code>ros2 launch px4 ...</code> 报"找不到 launch 文件"</td><td>相对路径 + 当前目录</td></tr>
+    <tr><td>PX4 的 <code>.params</code>、ROS2 的 <code>package.xml</code>、权重 <code>.pt</code></td><td>扩展名</td></tr>
+    <tr><td>Windows 训练好模型，搬到 WSL 里跑仿真</td><td>两种路径写法、<code>/mnt/c</code></td></tr>
+  </table>
+  <p><strong>一句预判：</strong>以后你遇到的"跑不起来"，一大半第一步都该问——<strong>"我现在站在哪个目录？"</strong></p>
+</div>
+
+<h2>七、自测（先自己想，再点开）</h2>
 
 <details>
   <summary>1. 用一句话说，路径是什么？</summary>
@@ -101,8 +132,18 @@
   <p>看开头：盘符 + 反斜杠（<code>C:\</code>）= Windows；以正斜杠开头、没有盘符（<code>/home</code>）= Linux。</p>
 </details>
 
-<h2>六、答题区</h2>
-<p class="hint">写完点下面的按钮生成答题卡，再复制发回给 AI。答案存在你手机本地，刷新不会丢。</p>
+<details>
+  <summary>5. 把 <code>照片.txt</code> 改名成 <code>照片.jpg</code>，它变成图片了吗？</summary>
+  <p>没有。扩展名只是标签，文件内容一个字节都没变，只是系统会拿画图软件去打开它，然后打不开。</p>
+</details>
+
+<details>
+  <summary>6. 为什么"显示扩展名"这个设置值得改？</summary>
+  <p>因为默认隐藏时，<code>病毒.docx.exe</code> 会显示成 <code>病毒.docx</code>，图标也是 Word 的。你看到的和实际运行的，不是一个东西。</p>
+</details>
+
+<h2>八、答题区</h2>
+<p class="hint">写完点 <strong>「提交到云端」</strong>，下次开课我直接读。提交不了再点「复制」贴回对话框。答案同时存在你手机本地，刷新不会丢。</p>
 
 <div class="answer-box">
   <label>Q1. 写出 <code>D:\研究生\代码\test.py</code> 的完整读法（从哪一层到哪一层）</label>
@@ -129,6 +170,11 @@
   <textarea id="q5" placeholder="因为..."></textarea>
 </div>
 
+<div class="answer-box">
+  <label>Q5. 你在 Windows 里看到一个文件叫 <code>实验数据.csv</code>，图标是 Excel。它一定是个表格吗？说明理由。</label>
+  <textarea id="q6" placeholder="不一定，因为..."></textarea>
+</div>
+
 <div class="btn-row">
   <button onclick="gen()">生成答题卡</button>
   <button class="secondary" onclick="copyOut()">复制</button>
@@ -149,16 +195,17 @@
   <p>做的时候<strong>先猜结果，再看实际结果</strong>。对不上，就说明哪个概念还没通。</p>
 </div>
 
-<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+<p class="foot">答完提交，这张就算过。没提交 = 没答。</p>
 
 <script>
-const ids = ['q1','q2','q3','q4','q5'];
+const ids = ['q1','q2','q3','q4','q5','q6'];
 const labels = {
   q1: 'Q1 读法',
   q2: 'Q2 系统判断',
   q3: 'Q3 绝对/相对 + 理由',
   q4: 'Q4 完整路径',
-  q5: '变式题'
+  q5: '变式题（重名文件）',
+  q6: 'Q5 扩展名'
 };
 
 // 恢复上次输入
@@ -177,7 +224,7 @@ function gen() {
   });
   const out = document.getElementById('out');
   out.value = text;
-  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+  document.getElementById('msg').textContent = '已生成，点「提交到云端」；不行再点「复制」。';
 }
 
 function copyOut() {

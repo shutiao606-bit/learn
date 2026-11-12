@@ -14,7 +14,7 @@
 </header>
 
 <h1>第 1 周 · 复盘</h1>
-<p class="sub">把五张卡串成一条线 ｜ 2026-11-14</p>
+<p class="sub">把五张卡串成一条线 ｜ 11/21 · 第 6 张</p>
 
 <h2>一、一张图串起来</h2>
 <div class="card">
@@ -44,8 +44,21 @@
   </ol>
 </div>
 
-<h2>三、综合测验</h2>
-<p class="hint">这些题故意混着考，用来检查你是"背下来了"还是"真串起来了"。答不上来就先别翻前面的卡，想三分钟再看。</p>
+<h2>三、这一周补的五个新词</h2>
+<div class="card">
+  <p>除了上面那条主链，这一周还顺手装进了五个词。它们不是重点，但<strong>以后一定会撞上</strong>：</p>
+  <table>
+    <tr><th>词</th><th>一句话</th><th>在哪张卡</th></tr>
+    <tr><td><strong>扩展名</strong></td><td>名字末尾的标签，不是身份证明</td><td>①</td></tr>
+    <tr><td><strong>退出码</strong></td><td>进程结束时留下的数字，0 = 成功</td><td>②</td></tr>
+    <tr><td><strong>端口</strong></td><td>进程向系统要的"房间号"</td><td>③</td></tr>
+    <tr><td><strong>挂载</strong></td><td>把一块设备接到树上的某个目录</td><td>④</td></tr>
+    <tr><td><strong>历史命令</strong></td><td><code>↑</code> 和 <code>Ctrl+R</code>，别再重敲</td><td>⑤</td></tr>
+  </table>
+</div>
+
+<h2>四、综合测验</h2>
+<p class="hint">这些题故意混着考，用来检查你是"背下来了"还是"真串起来了"。答不上来就先别翻前面的卡，想三分钟再看。写完点 <strong>「提交到云端」</strong>。</p>
 
 <div class="answer-box">
   <label>Q1. 下面两个路径分别属于哪个系统？各自从哪一层开始读？<br>A. <code>/home/px4/PX4-Autopilot</code><br>B. <code>E:\研究生\研一\学习资料\练习</code></label>
@@ -82,6 +95,16 @@
   <textarea id="q7" placeholder="我留...，因为..."></textarea>
 </div>
 
+<div class="answer-box">
+  <label>Q7. 你启动仿真，报 <code>Address already in use</code>。用「进程 / PID / 端口」这三个词，把解决过程说一遍。</label>
+  <textarea id="q8" placeholder="先...，因为..."></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q8. 一条命令跑完，屏幕上一片空白。你在 Windows 和 Linux 上分别敲什么来确认结果？0 和 1 各代表什么？</label>
+  <textarea id="q9" placeholder="Windows 敲...，Linux 敲...&#10;0 代表...，1 代表..."></textarea>
+</div>
+
 <div class="btn-row">
   <button onclick="gen()">生成答题卡</button>
   <button class="secondary" onclick="copyOut()">复制</button>
@@ -91,13 +114,14 @@
 <textarea id="out" placeholder="点「生成答题卡」，这里会出现可以复制的文字"></textarea>
 <p class="hint" id="msg"></p>
 
-<h2>四、过线的标准</h2>
+<h2>五、过线的标准</h2>
 <div class="card">
-  <p><strong>能独立做到下面三件事，才算第 1 周过关：</strong></p>
+  <p><strong>能独立做到下面四件事，才算第 1 周过关：</strong></p>
   <ol>
     <li>给你一个路径，你能说出它是哪个系统、绝对还是相对</li>
     <li>终端里给你一个目标目录，你能自己走过去并确认到了</li>
     <li>屏幕上出现一条报错，你能说出它断在"找命令 / 找文件 / 权限"哪一层</li>
+    <li>有人问你"刚才那条命令成功了吗"，你知道要去哪里看，而不是回答"屏幕上没报错"</li>
   </ol>
   <p>做不到第 2 条，就别进第 2 周 —— 第 2 周讲"程序怎么跑起来"，全程要在终端里操作。</p>
 </div>
@@ -108,10 +132,10 @@
   <p>答案是中间站着一个叫<strong>解释器</strong>的东西。你会第一次看清：源码 → 解释器 → 进程这条线，以及为什么"装了 Python 却跑不了 python"是常见病。</p>
 </div>
 
-<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+<p class="foot">答完提交，才算这周过关。没提交 = 没答。</p>
 
 <script>
-const ids = ['q1','q2','q3','q4','q5','q6','q7'];
+const ids = ['q1','q2','q3','q4','q5','q6','q7','q8','q9'];
 const labels = {
   q1: 'Q1 两个路径判断',
   q2: 'Q2 报错断在哪一步',
@@ -119,7 +143,9 @@ const labels = {
   q4: 'Q4 ..\\..\\Windows',
   q5: 'Q5 翻译成 WSL 路径',
   q6: 'Q6 口述：一条命令怎么跑',
-  q7: '变式题 只留一个词'
+  q7: '变式题 只留一个词',
+  q8: 'Q7 端口被占用（三个词）',
+  q9: 'Q8 退出码'
 };
 
 ids.forEach(id => {
@@ -137,7 +163,7 @@ function gen() {
   });
   const out = document.getElementById('out');
   out.value = text;
-  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+  document.getElementById('msg').textContent = '已生成，点「提交到云端」；不行再点「复制」。';
 }
 
 function copyOut() {

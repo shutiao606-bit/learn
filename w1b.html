@@ -14,7 +14,7 @@
 </header>
 
 <h1>第 1 周补充 · 一条命令怎么跑</h1>
-<p class="sub">把「路径 / 目录」和「进程」连起来的那根线 ｜ 2026-11-11</p>
+<p class="sub">把「路径 / 目录」和「进程」连起来的那根线 ｜ 11/17 · 第 2 张</p>
 
 <h2>一、为什么非要懂这个</h2>
 <div class="card">
@@ -83,7 +83,44 @@
   <p>打印出来的那一串目录，就是 shell 找程序时会去翻的抽屉。</p>
 </div>
 
-<h2>六、自测（先自己想，再点开）</h2>
+<h2>六、命令跑完了，成没成？——退出码</h2>
+<div class="card">
+  <p>很多命令跑完屏幕上一个字都不出。那你凭什么知道它成功了？</p>
+  <p>凭<strong>退出码</strong>：每个进程结束时会交给 shell 一个数字。</p>
+  <ul>
+    <li><code>0</code> —— <strong>成功</strong></li>
+    <li><strong>非 0</strong> —— 失败。不同的数字代表不同的失败原因，具体含义看程序的说明书</li>
+  </ul>
+  <p>注意反直觉的地方：<strong>屏幕上没报错，不等于成功</strong>。有些程序失败了也一声不吭，只在退出码里留个 1。</p>
+</div>
+<div class="analogy">
+  快递员送完货会回去交差：<strong>「送到了」</strong>（0）或者 <strong>「家里没人」</strong>（非 0）。<br>
+  你不问，他也走了——屏幕上什么都不显示，但结果已经定了。
+</div>
+<div class="card">
+  <p><strong>怎么看：</strong>紧接着上一条命令敲下面这句，问的就是"刚才那声命令，你交了哪个数"。</p>
+  <table>
+    <tr><th>系统</th><th>命令</th></tr>
+    <tr><td>Linux / WSL</td><td><code>echo $?</code></td></tr>
+    <tr><td>Windows PowerShell</td><td><code>echo $LASTEXITCODE</code></td></tr>
+    <tr><td>Windows cmd</td><td><code>echo %errorlevel%</code></td></tr>
+  </table>
+  <p>还有一个日常用法：<code>命令A &amp;&amp; 命令B</code> —— 只有 A 返回 0，B 才会执行。以后写自动化脚本全靠这个。</p>
+</div>
+
+<h2>七、以后在无人机里怎么用</h2>
+<div class="card">
+  <table>
+    <tr><th>以后你会碰到的</th><th>这一周对应的概念</th></tr>
+    <tr><td><code>ros2 launch px4 ...</code> 一条命令拉起十几个节点</td><td>shell 拆词、PATH 找程序</td></tr>
+    <tr><td><code>ros2: command not found</code> —— 十有八九是没 <code>source</code> 环境</td><td>PATH 清单里没有它</td></tr>
+    <tr><td>脚本里 <code>cd ws &amp;&amp; colcon build</code></td><td>退出码 + <code>&amp;&amp;</code></td></tr>
+    <tr><td>训练脚本跑了一夜，没人看着，成没成？</td><td>退出码</td></tr>
+  </table>
+  <p><strong>为什么这跟你有关：</strong>以后你写的第一条正式命令，多半是 <code>source /opt/ros/humble/setup.bash</code>。它干的事就是<strong>往 PATH 里加目录</strong>——今天这张卡你不懂，那天就只能照抄。</p>
+</div>
+
+<h2>八、自测（先自己想，再点开）</h2>
 
 <details>
   <summary>1. 终端和 shell 有什么区别？</summary>
@@ -105,8 +142,18 @@
   <p>通常在第 3 步之后：程序找到了、也跑起来了，但它按你给的路径（参数）去开文件，发现没有这个文件。</p>
 </details>
 
-<h2>七、答题区</h2>
-<p class="hint">写完点下面的按钮生成答题卡，再复制发回给 AI。答案存在你手机本地，刷新不会丢。</p>
+<details>
+  <summary>5. 敲完一条命令，屏幕什么都没显示。它成功了吗？</summary>
+  <p>不知道。要敲 <code>echo $?</code> 看退出码：0 是成功，非 0 是失败。屏幕上没字，什么也说明不了。</p>
+</details>
+
+<details>
+  <summary>6. <code>命令A &amp;&amp; 命令B</code> 里，A 失败了，B 会跑吗？</summary>
+  <p>不会。<code>&amp;&amp;</code> 的意思就是"A 交出 0 才轮到 B"，A 失败就直接停。</p>
+</details>
+
+<h2>九、答题区</h2>
+<p class="hint">写完点 <strong>「提交到云端」</strong>，下次开课我直接读。提交不了再点「复制」贴回对话框。答案同时存在你手机本地，刷新不会丢。</p>
 
 <div class="answer-box">
   <label>Q1. 一条命令从按回车到屏幕出结果，经过哪三个角色？各干什么？</label>
@@ -133,6 +180,11 @@
   <textarea id="q5" placeholder="会跑…，因为…"></textarea>
 </div>
 
+<div class="answer-box">
+  <label>Q5. 你昨晚跑了一个训练脚本，今早屏幕上一个字都没有。怎么判断它跑成功了？</label>
+  <textarea id="q6" placeholder="敲…，看到…说明…"></textarea>
+</div>
+
 <div class="btn-row">
   <button onclick="gen()">生成答题卡</button>
   <button class="secondary" onclick="copyOut()">复制</button>
@@ -152,16 +204,17 @@
   </ul>
 </div>
 
-<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+<p class="foot">答完提交，这张就算过。没提交 = 没答。</p>
 
 <script>
-const ids = ['q1','q2','q3','q4','q5'];
+const ids = ['q1','q2','q3','q4','q5','q6'];
 const labels = {
   q1: 'Q1 三个角色',
   q2: 'Q2 程序名 vs 参数',
   q3: 'Q3 where python 拆词',
   q4: 'Q4 报错断在哪一步',
-  q5: '变式题'
+  q5: '变式题（同名程序）',
+  q6: 'Q5 退出码'
 };
 
 ids.forEach(id => {
@@ -179,7 +232,7 @@ function gen() {
   });
   const out = document.getElementById('out');
   out.value = text;
-  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+  document.getElementById('msg').textContent = '已生成，点「提交到云端」；不行再点「复制」。';
 }
 
 function copyOut() {

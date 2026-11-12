@@ -14,7 +14,7 @@
 </header>
 
 <h1>第 1 周 · Windows 路径 vs Linux 路径</h1>
-<p class="sub">你现在练的全是 Windows，以后干活全在 Linux ｜ 2026-11-13</p>
+<p class="sub">你现在练的全是 Windows，以后干活全在 Linux ｜ 11/19 · 第 4 张</p>
 
 <h2>一、为什么非要懂这个</h2>
 <div class="card">
@@ -80,7 +80,28 @@
   <p>规律：<strong>盘符变小写、塞进 <code>/mnt/</code>、反斜杠全改成正斜杠</strong>。</p>
 </div>
 
-<h2>六、最容易踩的四个坑</h2>
+<h2>六、"挂载"到底是什么意思</h2>
+<div class="card">
+  <p>上一节说"U 盘挂在树上的某个枝头"。这个"挂"是个正经的计算机术语，叫<strong>挂载（mount）</strong>。</p>
+  <p><strong>挂载 = 把一个存储设备的内容，接到树上的某个目录上。</strong>接上去的那个目录叫<strong>挂载点</strong>。挂上之后，你走进这个目录，看到的就是那块设备里的东西。</p>
+  <p>你已经见过三个挂载了：</p>
+  <table>
+    <tr><th>设备</th><th>挂在</th></tr>
+    <tr><td>Windows 的整个 C 盘</td><td><code>/mnt/c</code>（WSL 帮你挂的）</td></tr>
+    <tr><td>插上的 U 盘</td><td>通常是 <code>/media/你/USB名</code></td></tr>
+    <tr><td>服务器的共享文件夹</td><td>你指定一个空目录，比如 <code>/mnt/nas</code></td></tr>
+  </table>
+</div>
+<div class="analogy">
+  树本来只长自己那几根枝。挂载就是<strong>把另一棵树的一根枝，接口接到自己这棵树的某个位置上</strong>。<br>
+  接在哪，哪就"长出"那棵树的内容。拆掉挂载（<code>umount</code>），那个目录又变回空文件夹。
+</div>
+<div class="card">
+  <p><strong>为什么这件事现在就要知道：</strong>以后跑仿真，你会用到 Docker。Docker 的 <code>-v 本地目录:容器内目录</code>，<strong>干的完全是同一件事</strong>——把一个目录挂到另一个"树"里。</p>
+  <p>到时候别人说"把工作空间挂进容器"，你脑子里得有这根枝。</p>
+</div>
+
+<h2>七、最容易踩的四个坑</h2>
 <div class="card">
   <ol>
     <li><strong>把 <code>C:\...</code> 原样粘进 Linux</strong> → 找不到文件。要先翻译成 <code>/mnt/c/...</code></li>
@@ -90,7 +111,20 @@
   </ol>
 </div>
 
-<h2>七、自测（先自己想，再点开）</h2>
+<h2>八、以后在无人机里怎么用</h2>
+<div class="card">
+  <table>
+    <tr><th>以后你会碰到的</th><th>今天对应的概念</th></tr>
+    <tr><td>工作空间 <code>~/ros2_ws/src</code></td><td>家目录、绝对路径</td></tr>
+    <tr><td>从 Windows 拷数据集到 Ubuntu</td><td><code>/mnt/c</code> 的翻译规则</td></tr>
+    <tr><td><code>import Numpy</code> 在 Windows 能跑、Linux 报错</td><td>大小写敏感</td></tr>
+    <tr><td>跑 PX4 用 Docker，把 <code>~/px4</code> 挂进容器</td><td>挂载</td></tr>
+    <tr><td>Gazebo 找不到模型，路径里带空格</td><td>引号与空格</td></tr>
+  </table>
+  <p><strong>为什么这条最值钱：</strong>PX4、ROS2、Gazebo 全在 Ubuntu 上。你现在这一周在 Windows 上练的所有命令，<strong>搬过去只差一个路径写法</strong>。练的是同一个能力。</p>
+</div>
+
+<h2>九、自测（先自己想，再点开）</h2>
 
 <details>
   <summary>1. 为什么 Linux 没有 C 盘、D 盘？</summary>
@@ -112,8 +146,18 @@
   <p>Linux 的文件系统（ext4 等）本身就是区分大小写的，这是设计如此，不是 bug。Python 的模块名、ROS2 的包名也都遵循这个规则。</p>
 </details>
 
-<h2>八、答题区</h2>
-<p class="hint">写完点下面的按钮生成答题卡，再复制发回给 AI。答案存在你手机本地，刷新不会丢。</p>
+<details>
+  <summary>5. "挂载"用一句话怎么说？</summary>
+  <p>把一个存储设备的内容接到树上某个目录下面，那个目录叫挂载点。接上之后，走进那个目录就等于走进了那块设备。</p>
+</details>
+
+<details>
+  <summary>6. 为什么 Linux 要这么麻烦，不干脆也用 C 盘 D 盘？</summary>
+  <p>因为一棵树可以用同一套规则描述任意多的设备，还能随时接上、拆下（比如网络盘、容器）。盘符方案一想到"第 27 块盘"就没字母可用了。</p>
+</details>
+
+<h2>十、答题区</h2>
+<p class="hint">写完点 <strong>「提交到云端」</strong>，下次开课我直接读。提交不了再点「复制」贴回对话框。答案同时存在你手机本地，刷新不会丢。</p>
 
 <div class="answer-box">
   <label>Q1. 用一句话说清：为什么 Windows 有盘符、Linux 没有？</label>
@@ -140,6 +184,11 @@
   <textarea id="q5" placeholder="..."></textarea>
 </div>
 
+<div class="answer-box">
+  <label>Q5. 用"挂载点"这个词，解释为什么 <code>/mnt/c/Users/24281</code> 能看到 Windows 的文件。</label>
+  <textarea id="q6" placeholder="因为 C 盘被挂到了...，所以..."></textarea>
+</div>
+
 <div class="btn-row">
   <button onclick="gen()">生成答题卡</button>
   <button class="secondary" onclick="copyOut()">复制</button>
@@ -160,16 +209,17 @@
   <p><strong>先猜结果，再看。</strong>猜错了才有收获。</p>
 </div>
 
-<p class="foot">学完把答题卡贴回对话框，或写成一行进度</p>
+<p class="foot">答完提交，这张就算过。没提交 = 没答。</p>
 
 <script>
-const ids = ['q1','q2','q3','q4','q5'];
+const ids = ['q1','q2','q3','q4','q5','q6'];
 const labels = {
   q1: 'Q1 盘符 vs 一棵树',
   q2: 'Q2 翻译成 WSL 路径',
   q3: 'Q3 判断哪些是 Linux',
   q4: 'Q4 cd C:\\Users 错在哪',
-  q5: '变式题 U 盘挂在哪'
+  q5: '变式题 U 盘挂在哪',
+  q6: 'Q5 挂载点'
 };
 
 ids.forEach(id => {
@@ -187,7 +237,7 @@ function gen() {
   });
   const out = document.getElementById('out');
   out.value = text;
-  document.getElementById('msg').textContent = '已生成，点「复制」然后贴回对话框。';
+  document.getElementById('msg').textContent = '已生成，点「提交到云端」；不行再点「复制」。';
 }
 
 function copyOut() {
