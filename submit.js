@@ -46,6 +46,11 @@
       ua: navigator.userAgent.slice(0, 200)
     });
 
+    // 20 秒没回音就当作网络不通，免得按钮一直卡在"提交中…"
+    var ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 20000) : null;
+    function done() { if (timer) clearTimeout(timer); }
+
     // 先同时带 apikey + Authorization；新版 sb_publishable_ 钥匙如果被拒，
     // 自动退回只带 apikey 再试一次。
     function post(withAuth) {
@@ -55,13 +60,19 @@
         'Prefer': 'return=minimal'
       };
       if (withAuth) h['Authorization'] = 'Bearer ' + cfg.anonKey;
-      return fetch(endpoint, { method: 'POST', headers: h, body: payload });
+      return fetch(endpoint, {
+        method: 'POST',
+        headers: h,
+        body: payload,
+        signal: ctrl ? ctrl.signal : undefined
+      });
     }
 
     post(true).then(function (r) {
       if (r.status === 401 || r.status === 403) return post(false);
       return r;
     }).then(function (r) {
+      done();
       if (r.status === 201 || r.status === 204) {
         localStorage.setItem('sb_last_' + document.title, new Date().toISOString());
         say('已提交到云端。下次开对话我直接读，不用再贴。', true);
@@ -72,14 +83,18 @@
         }, 4000);
       } else {
         return r.text().then(function (t) {
-          say('提交失败（' + r.status + '）：' + t.slice(0, 120), false);
-          btn.textContent = '提交到云端';
+          say('服务器拒绝了（HTTP ' + r.status + '）：' + t.slice(0, 120), false);
+          btn.textContent = '再次提交';
           btn.disabled = false;
         });
       }
     }).catch(function (e) {
-      say('网络不通：' + e.message, false);
-      btn.textContent = '提交到云端';
+      done();
+      var why = (e && e.name === 'AbortError')
+        ? '等了 20 秒没回音，这台设备连不上 supabase.co'
+        : '连不上 supabase.co（' + ((e && e.message) || e) + '）';
+      say(why + '。答案先点「复制」存一份，换网络后再提交。', false);
+      btn.textContent = '再次提交';
       btn.disabled = false;
     });
   }
