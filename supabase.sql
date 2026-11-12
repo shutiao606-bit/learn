@@ -15,6 +15,11 @@ create table if not exists public.answers (
 -- 打开行级安全：这是"只写不读"的关键
 alter table public.answers enable row level security;
 
+-- 显式授权：这样不管建项目时"自动暴露新表"开没开，都能提交
+grant usage on schema public to anon;
+grant insert on public.answers to anon;
+grant usage, select on all sequences in schema public to anon;
+
 -- 允许匿名用户（网页里的 anon key）插入
 drop policy if exists "anon can insert" on public.answers;
 create policy "anon can insert"
