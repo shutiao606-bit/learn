@@ -38,20 +38,29 @@
     btn.disabled = true;
     btn.textContent = '提交中…';
 
-    fetch(cfg.url.replace(/\/$/, '') + '/rest/v1/answers', {
-      method: 'POST',
-      headers: {
+    var endpoint = cfg.url.replace(/\/$/, '') + '/rest/v1/answers';
+    var payload = JSON.stringify({
+      card: document.title,
+      week: cfg.week || '',
+      body: body,
+      ua: navigator.userAgent.slice(0, 200)
+    });
+
+    // 先同时带 apikey + Authorization；新版 sb_publishable_ 钥匙如果被拒，
+    // 自动退回只带 apikey 再试一次。
+    function post(withAuth) {
+      var h = {
         'apikey': cfg.anonKey,
-        'Authorization': 'Bearer ' + cfg.anonKey,
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({
-        card: document.title,
-        week: cfg.week || '',
-        body: body,
-        ua: navigator.userAgent.slice(0, 200)
-      })
+      };
+      if (withAuth) h['Authorization'] = 'Bearer ' + cfg.anonKey;
+      return fetch(endpoint, { method: 'POST', headers: h, body: payload });
+    }
+
+    post(true).then(function (r) {
+      if (r.status === 401 || r.status === 403) return post(false);
+      return r;
     }).then(function (r) {
       if (r.status === 201 || r.status === 204) {
         localStorage.setItem('sb_last_' + document.title, new Date().toISOString());
