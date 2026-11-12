@@ -39,6 +39,38 @@ git push
 
 ---
 
+## 云端答题（Supabase，2026-11-12 接入）
+
+网页上的「提交到云端」按钮把答题卡 POST 到 Supabase，AI 开课时用本机密钥读取。
+
+### 一次性配置（约 5 分钟）
+
+1. **注册** https://supabase.com → New project（区域选 Singapore 或 Tokyo，离得近）
+2. **建表**：左侧 SQL Editor → New query → 粘贴 [supabase.sql](supabase.sql) 全文 → Run
+3. **取两把钥匙**：Settings → API Keys
+   - `Project URL` + `anon` / `public` key → 填进 [config.js](config.js)
+   - `service_role` / `secret` key → **只**填进本机 `../tools/supabase.env`（照 `supabase.env.example` 复制）
+4. 推送网页，按钮就会出现
+
+### 两把钥匙的区别（安全关键）
+
+| 钥匙 | 放哪 | 能干什么 |
+|---|---|---|
+| `anon` | 网页里，**公开** | 只能 insert，读不到任何数据（RLS 保证） |
+| `service_role` | **只在本机** | 能读全部 |
+
+> RLS 必须开着。`supabase.sql` 里只建了 insert 策略、**故意不建 select 策略**——这是"只写不读"的全部秘密。
+
+### 读取
+
+```bash
+python -I -X utf8 "C:/Users/24281/学习/tools/read_answers.py"
+python -I -X utf8 "C:/Users/24281/学习/tools/read_answers.py" 30
+python -I -X utf8 "C:/Users/24281/学习/tools/read_answers.py" --card 进程
+```
+
+---
+
 ## 排查
 
 - **打不开**：先试 IPv4 / 换个网络。`github.io` 在部分网络下 IPv6 不通，走 IPv4 通常正常
