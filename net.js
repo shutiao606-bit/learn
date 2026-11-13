@@ -22,6 +22,29 @@
     return String(cfg.url || '').replace(/\/$/, '') + '/rest/v1/answers';
   }
 
+  function root() {
+    return String(cfg.url || '').replace(/\/$/, '') + '/rest/v1/';
+  }
+
+  // 预热：页面一打开就先朝服务器打个招呼，把 DNS 和 TLS 握手提前做好。
+  // 微信内置的 XWeb 内核首次连接经常超时（"刚开始几次连不上"），
+  // 等用户写完答案再点提交时，连接已经是热的了。
+  var warmed = false;
+  function warm() {
+    if (warmed || !configured()) return;
+    warmed = true;
+    try {
+      fetch(root(), { method: 'HEAD', mode: 'no-cors', cache: 'no-store' })
+        .catch(function () {});
+    } catch (e) {
+      try {
+        var x = new XMLHttpRequest();
+        x.open('HEAD', root(), true);
+        x.send(null);
+      } catch (e2) {}
+    }
+  }
+
   function headers(withAuth) {
     var h = {
       'apikey': cfg.anonKey,
@@ -102,13 +125,17 @@
   }
 
   // 一次请求 + 自动重试（只在"根本没连上"时重试，服务器回错误码不重试）
+  // 间隔逐渐拉长：0.8s → 1.5s → 2.5s → 4s，给冷启动的握手留时间
+  var GAP = [800, 1500, 2500, 4000, 6000];
   function send(opt, tries, onRetry) {
     var n = tries || 3;
     function go(left) {
       return once(opt).catch(function (e) {
         if (left <= 1) throw e;
         if (onRetry) onRetry(n - left + 2, n);
-        return new Promise(function (r) { setTimeout(r, 1500); })
+        var wait = GAP[Math.min(n - left, GAP.length - 1)] || 1500;
+        warm();
+        return new Promise(function (r) { setTimeout(r, wait); })
           .then(function () { return go(left - 1); });
       });
     }
@@ -182,8 +209,16 @@
   window.Net = {
     configured: configured,
     url: url,
+    warm: warm,
     send: send,
     outbox: { push: push, remove: remove, count: count, flush: flush, read: readBox },
     inWeChat: function () { return /MicroMessenger/i.test(navigator.userAgent); }
   };
+
+  // 页面一载入就预热连接
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', warm);
+  } else {
+    warm();
+  }
 })();

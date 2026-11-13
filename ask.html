@@ -127,12 +127,27 @@ function post(payload, onDone, onFail) {
       if (r.status === 201 || r.status === 204) { Net.outbox.remove(id); onDone(); }
       else onFail(new Error('服务器返回 ' + r.status));
     })
-    .catch(e => {
-      const wx = Net.inWeChat();
-      const msg = wx
-        ? '微信里发不出去，但内容已存在本机，会下次自动补发。或点右上角「···」→「在浏览器打开」'
-        : '试了 3 次都没连上，内容已存在本机，下次打开自动补发';
-      onFail(new Error(msg));
+    .catch(() => {
+      onFail(new Error('第一下没连上，正在后台重试…'));
+      // 转后台继续试：每 5 秒一次，最多 6 次
+      let left = 6;
+      const tick = () => {
+        setTimeout(() => {
+          Net.warm();
+          Net.send({ body: JSON.stringify(payload) }, 1).then(r => {
+            if (r.status === 201 || r.status === 204) {
+              Net.outbox.remove(id);
+              onDone();
+            } else {
+              onFail(new Error('服务器返回 ' + r.status));
+            }
+          }, () => {
+            if (--left > 0) tick();
+            else onFail(new Error('内容已存在本机，下次打开页面会自动补发'));
+          });
+        }, 5000);
+      };
+      tick();
     });
 }
 

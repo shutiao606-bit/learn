@@ -67,7 +67,54 @@
     anchor.parentNode.insertBefore(box, anchor.nextSibling);
   }
 
+  var busy = false;
+
+  function markDone() {
+    try { localStorage.setItem('sb_last_' + document.title, new Date().toISOString()); } catch (e) {}
+    if (cardFile) {
+      try { localStorage.setItem('done_' + cardFile, new Date().toISOString()); } catch (e) {}
+    }
+  }
+
+  // 前台等不到，就转后台：每 5 秒再试一次，最多 6 次（约 30 秒）。
+  // 成功就贴 ✓，失败就交给本机队列，下次打开页面自动补发。
+  function keepTrying(boxId, payload, left) {
+    if (left <= 0) {
+      busy = false;
+      say('答案已存本机。下次打开任意一页会自动补发，不会丢。', false);
+      btn.textContent = '再次提交';
+      btn.disabled = false;
+      if (Net.inWeChat()) weChatPanel();
+      return;
+    }
+    say('没连上，后台重试中（还剩 ' + left + ' 次）…', false);
+    setTimeout(function () {
+      Net.warm();
+      Net.send({ body: JSON.stringify(payload) }, 1).then(function (r) {
+        if (r.status === 201 || r.status === 204) {
+          Net.outbox.remove(boxId);
+          markDone();
+          busy = false;
+          say('已提交到云端（后台重试成功）。下次开对话我直接读。', true);
+          btn.textContent = '已提交 ✓';
+          setTimeout(function () {
+            btn.textContent = '提交到云端';
+            btn.disabled = false;
+          }, 4000);
+        } else {
+          busy = false;
+          say('服务器拒绝了（HTTP ' + r.status + '）：' + r.text.slice(0, 120), false);
+          btn.textContent = '再次提交';
+          btn.disabled = false;
+        }
+      }, function () {
+        keepTrying(boxId, payload, left - 1);
+      });
+    }, 5000);
+  }
+
   function submit() {
+    if (busy) return;
     var body = buildText();
     if (!body || body.length < 5) {
       say('先答题，或者先点「生成答题卡」。', false);
@@ -84,18 +131,18 @@
     // 先落盘，再发送。顺序不能反：这样哪怕马上没网，答案也已经在本机了。
     var boxId = Net.outbox.push(payload, cardFile);
 
+    busy = true;
     btn.disabled = true;
     btn.textContent = '提交中…';
+    Net.warm();
 
     Net.send({ body: JSON.stringify(payload) }, 3, function (i, n) {
-      say('没连上，正在重试（' + i + '/' + n + '）…', false);
+      say('第一下没连上，正在自动重试（' + i + '/' + n + '）…', false);
     }).then(function (r) {
       if (r.status === 201 || r.status === 204) {
         Net.outbox.remove(boxId);
-        try { localStorage.setItem('sb_last_' + document.title, new Date().toISOString()); } catch (e) {}
-        if (cardFile) {
-          try { localStorage.setItem('done_' + cardFile, new Date().toISOString()); } catch (e) {}
-        }
+        markDone();
+        busy = false;
         say('已提交到云端（' + r.via + '）。下次开对话我直接读。', true);
         btn.textContent = '已提交 ✓';
         setTimeout(function () {
@@ -103,16 +150,14 @@
           btn.disabled = false;
         }, 4000);
       } else {
+        busy = false;
         say('服务器拒绝了（HTTP ' + r.status + '）：' + r.text.slice(0, 120), false);
         btn.textContent = '再次提交';
         btn.disabled = false;
       }
-    }).catch(function (e) {
-      var why = (e && e.name === 'AbortError') ? '试了 3 次都超时' : '试了 3 次都连不上';
-      say(why + '，但答案已经存在本机（草稿队列）。', false);
-      btn.textContent = '再次提交';
-      btn.disabled = false;
-      if (Net.inWeChat()) weChatPanel();
+    }).catch(function () {
+      // 先别急着报失败——答案已经在本机了，转后台继续试
+      keepTrying(boxId, payload, 6);
     });
   }
 
