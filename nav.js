@@ -24,6 +24,27 @@
 
   // 首页：给答过的卡片加角标
   if (cur === 'index.html') {
+    // 进度环
+    var card = document.getElementById('progress');
+    if (card) {
+      var done = 0;
+      for (var j = 0; j < CARDS.length; j++) {
+        if (isDone(CARDS[j].f)) done++;
+      }
+      var C = 113.1; // 2πr，r = 18
+      var wrap = document.createElement('div');
+      wrap.className = 'ring-wrap';
+      wrap.innerHTML =
+        '<svg class="ring" viewBox="0 0 44 44">' +
+        '<circle class="ring-bg" cx="22" cy="22" r="18"></circle>' +
+        '<circle class="ring-fg" cx="22" cy="22" r="18" ' +
+        'stroke-dasharray="' + C + '" ' +
+        'stroke-dashoffset="' + (C * (1 - done / CARDS.length)) + '"></circle>' +
+        '</svg>' +
+        '<span class="ring-num">' + done + '/' + CARDS.length + '</span>';
+      card.insertBefore(wrap, card.firstChild);
+    }
+
     var links = document.querySelectorAll('a.nav-card');
     for (var i = 0; i < links.length; i++) {
       var href = links[i].getAttribute('href');
@@ -71,4 +92,13 @@
   var foot = document.querySelector('.foot');
   if (foot) foot.parentNode.insertBefore(nav, foot);
   else document.body.appendChild(nav);
+
+  // 顶部阅读进度条：只在支持 scroll-driven animation 的浏览器出现
+  try {
+    if (window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()')) {
+      var bar = document.createElement('div');
+      bar.className = 'rbar';
+      document.body.appendChild(bar);
+    }
+  } catch (e) { /* 老浏览器忽略 */ }
 })();

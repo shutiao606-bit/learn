@@ -596,3 +596,170 @@ button.cloud { background: #15803d; }
   padding-top: var(--s2);
   margin-top: var(--s3);
 }
+
+/* ============================================================
+   视觉升级 v2（2026-11-13）
+   目标：层次更清楚、质感更细，不加装饰性噪声
+   ============================================================ */
+
+/* 1. 页面底：顶部一层极淡色晕，白卡自然浮起来 */
+body {
+  background:
+    radial-gradient(900px 380px at 50% -160px, rgba(37, 99, 235, .10), transparent 72%),
+    var(--bg);
+  background-attachment: fixed, scroll;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background:
+      radial-gradient(900px 380px at 50% -160px, rgba(122, 162, 255, .14), transparent 72%),
+      var(--bg);
+  }
+}
+
+/* 2. 标题：更大、更紧、更实 */
+h1 {
+  font-size: 1.78em;
+  font-weight: 750;
+  letter-spacing: -.022em;
+  line-height: 1.24;
+  margin: var(--s5) 0 var(--s2);
+}
+h2 {
+  font-size: 1.13em;
+  letter-spacing: -.008em;
+  padding-left: var(--s3);
+  border-left: 3px solid transparent;
+  border-image: linear-gradient(180deg, var(--accent), #7c5cff) 1;
+  border-image-slice: 1;
+  border-radius: 0;
+}
+
+/* 3. 首页头图 */
+.hero {
+  padding: var(--s6) 0 var(--s5);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--s5);
+}
+.hero h1 { margin: var(--s1) 0 var(--s2); }
+.hero .lede {
+  font-size: 1.02em;
+  color: var(--muted);
+  margin: 0;
+}
+.chip {
+  letter-spacing: .02em;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* 4. 卡片：更软的圆角 + 两层阴影，边缘几乎不可见 */
+.card {
+  border-radius: 18px;
+  border-color: color-mix(in srgb, var(--line) 70%, transparent);
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, .04),
+    0 8px 24px -18px rgba(16, 24, 40, .35);
+}
+
+/* 5. 入口卡：悬停轻抬，箭头跟着走 */
+.nav-card {
+  border-radius: 16px;
+  transition: transform .14s ease, border-color .16s, box-shadow .18s;
+}
+.nav-card:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 4px rgba(16, 24, 40, .05),
+    0 14px 30px -20px rgba(16, 24, 40, .45);
+}
+.nav-card::after { transition: transform .16s, color .16s; }
+.nav-card:hover::after { transform: translateY(-50%) translateX(3px); color: var(--accent); }
+
+/* 6. 按钮：主按钮带一点纵向渐变和投影 */
+button {
+  background: linear-gradient(180deg, #3b74f5, #2563eb);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .12), 0 6px 16px -12px rgba(37, 99, 235, .8);
+  border-radius: 13px;
+}
+button.cloud {
+  background: linear-gradient(180deg, #1a9a52, #15803d);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .12), 0 6px 16px -12px rgba(21, 128, 61, .8);
+}
+button.secondary {
+  background: var(--card);
+  box-shadow: none;
+}
+@media (prefers-color-scheme: dark) {
+  button { background: linear-gradient(180deg, #4d82ff, #3466e8); }
+  button.cloud { background: linear-gradient(180deg, #37a86b, #2b8a58); }
+  button.secondary { background: var(--card); }
+}
+
+/* 7. 热门条目做成卡片 */
+.hot {
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px 16px 16px 4px;
+  padding: var(--s4);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px -18px rgba(16, 24, 40, .35);
+}
+.hot h3 { font-size: 1.02em; letter-spacing: -.005em; }
+
+/* 8. 上一张 / 下一张：更紧凑，箭头更明显 */
+.pager a {
+  border-radius: 14px;
+  transition: transform .12s, border-color .15s, box-shadow .18s;
+}
+.pager a:hover { transform: translateY(-1px); }
+.pager a:hover span { color: var(--fg); }
+
+/* 9. 顶栏再收一点 */
+.topbar {
+  border-bottom-color: color-mix(in srgb, var(--line) 75%, transparent);
+}
+
+/* 10. 进度环（首页「当前进度」卡片里，由 nav.js 注入） */
+.ring-wrap {
+  position: relative;
+  float: right;
+  width: 66px;
+  height: 66px;
+  margin: 0 0 var(--s1) var(--s4);
+}
+.ring { display: block; width: 66px; height: 66px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 4.5; }
+.ring .ring-bg { stroke: var(--line-strong); opacity: .45; }
+.ring .ring-fg {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset .5s ease;
+}
+.ring-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .78em;
+  font-weight: 750;
+  letter-spacing: -.02em;
+  color: var(--accent-ink);
+}
+
+/* 11. 阅读进度条（仅支持 scroll-driven animation 的浏览器显示） */
+.rbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 60;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--accent), #7c5cff);
+  animation: rbar-grow linear;
+  animation-timeline: scroll(root block);
+  pointer-events: none;
+}
+@keyframes rbar-grow { to { transform: scaleX(1); } }
