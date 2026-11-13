@@ -124,7 +124,7 @@ function post(payload, onDone, onFail) {
   const id = Net.outbox.push(payload, 'ask.html');
   Net.send({ body: JSON.stringify(payload) }, 3)
     .then(r => {
-      if (r.status === 201 || r.status === 204) { Net.outbox.remove(id); onDone(); }
+      if (Net.isOk(r.status)) { Net.outbox.remove(id); onDone(); }
       else onFail(new Error('服务器返回 ' + r.status));
     })
     .catch(() => {
@@ -135,7 +135,7 @@ function post(payload, onDone, onFail) {
         setTimeout(() => {
           Net.warm();
           Net.send({ body: JSON.stringify(payload) }, 1).then(r => {
-            if (r.status === 201 || r.status === 204) {
+            if (Net.isOk(r.status)) {
               Net.outbox.remove(id);
               onDone();
             } else {

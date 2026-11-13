@@ -763,3 +763,41 @@ button.secondary {
   pointer-events: none;
 }
 @keyframes rbar-grow { to { transform: scaleX(1); } }
+
+/* ---------- 提交失败时的提示面板 ---------- */
+.wx-panel {
+  margin: var(--s3) 0;
+  padding: var(--s4);
+  border: 1px solid rgba(240, 180, 41, .45);
+  border: 1px solid color-mix(in srgb, var(--warn-line) 45%, transparent);
+  border-radius: var(--radius);
+  background: rgba(240, 180, 41, .07);
+  background: color-mix(in srgb, var(--warn-line) 7%, var(--bg));
+  font-size: .95em;
+  line-height: 1.6;
+}
+.wx-panel strong { display: block; margin-bottom: var(--s2); }
+.wx-panel p { margin: var(--s2) 0; }
+.wx-panel .copy-link,
+.wx-panel .copy-diag {
+  margin-top: var(--s1);
+  padding: 8px 14px;
+  font-size: .95em;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--fg);
+  font-family: inherit;
+}
+.diag-pre {
+  margin: var(--s2) 0;
+  padding: var(--s2) var(--s3);
+  background: var(--card);
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+}

@@ -21,6 +21,12 @@
   <p class="hint">五项里只要有一项 ✅，就说明网络本身能到 supabase。</p>
 </div>
 
+<h2>测试内容</h2>
+<div class="card">
+  <p>第 ⑥ 步会原样提交这段文字（约 2KB，和真实答案差不多大），用来判断是不是"小请求能过、大请求过不去"。</p>
+  <textarea id="fill" rows="4"></textarea>
+</div>
+
 <h2>结果</h2>
 <div class="card">
   <table id="res">
@@ -29,6 +35,7 @@
     <tr><td>③ 能不能带钥匙读</td><td id="r2" class="wait">等待…</td></tr>
     <tr><td>④ fetch 写通道</td><td id="r3" class="wait">等待…</td></tr>
     <tr><td>⑤ XHR 写通道</td><td id="r4" class="wait">等待…</td></tr>
+    <tr><td>⑥ 真实大小提交</td><td id="r5" class="wait">等待…</td></tr>
   </table>
   <div class="btn-row">
     <button type="button" id="again">再测一次</button>
@@ -56,8 +63,10 @@
 <script>
 (function () {
   var cfg = window.SB || {};
-  var base = String(cfg.url || '').replace(/\/$/, '');
+  var useFn = !!cfg.endpoint;
+  var base = String(cfg.endpoint || cfg.url || '').replace(/\/$/, '');
   var key = cfg.anonKey || '';
+  var EP = useFn ? base : base + '/rest/v1/answers';
   var log = [];
 
   function set(i, cls, text) {
@@ -101,6 +110,7 @@
   }
 
   function H(auth) {
+    if (useFn) return { 'Content-Type': 'application/json' };
     var h = { 'apikey': key, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
     if (auth) h['Authorization'] = 'Bearer ' + key;
     return h;
@@ -109,7 +119,7 @@
   function run() {
     log = [];
     document.getElementById('log').textContent = '';
-    ['r0', 'r1', 'r2', 'r3', 'r4'].forEach(function (id) {
+    ['r0', 'r1', 'r2', 'r3', 'r4', 'r5'].forEach(function (id) {
       document.getElementById(id).className = 'wait';
       document.getElementById(id).textContent = '等待…';
     });
@@ -121,11 +131,11 @@
     note('UA: ' + navigator.userAgent);
     note('fetch: ' + (typeof fetch) + ' / XHR: ' + (typeof XMLHttpRequest) +
          ' / AbortController: ' + (typeof AbortController));
-    note('endpoint: ' + base + '/rest/v1/answers');
+    note('endpoint: ' + EP + (useFn ? '（自建后端）' : '（supabase）'));
 
     // ② 纯连通性：no-cors GET 根路径。它会回 401，但能收到响应就说明网络通
     var t = performance.now();
-    viaFetch({ url: base + '/rest/v1/', method: 'GET', mode: 'no-cors' })
+    viaFetch({ url: useFn ? EP : base + '/rest/v1/', method: 'GET', mode: 'no-cors' })
       .then(function () {
         set(1, 'ok', '✅ 能连上（' + ms(t) + '）');
         note('② no-cors GET 到达');
@@ -137,7 +147,7 @@
       .then(function () {
         var t2 = performance.now();
         return viaFetch({
-          url: base + '/rest/v1/answers?select=id&limit=1',
+          url: useFn ? EP : base + '/rest/v1/answers?select=id&limit=1',
           method: 'GET',
           headers: H(true)
         }).then(function (r) {
@@ -151,7 +161,7 @@
       // ④ fetch 写通道：故意发空 body，服务器会回 400，但能收到 400 就说明通道通
       .then(function () {
         var t3 = performance.now();
-        return viaFetch({ url: base + '/rest/v1/answers', method: 'POST', headers: H(true), body: '' })
+        return viaFetch({ url: EP, method: 'POST', headers: H(true), body: '' })
           .then(function (r) {
             set(3, 'ok', '✅ HTTP ' + r.status + '（' + ms(t3) + '）');
             note('④ fetch POST -> ' + r.status);
@@ -163,13 +173,31 @@
       // ⑤ XHR 写通道
       .then(function () {
         var t4 = performance.now();
-        return viaXHR({ url: base + '/rest/v1/answers', method: 'POST', headers: H(true), body: '' })
+        return viaXHR({ url: EP, method: 'POST', headers: H(true), body: '' })
           .then(function (r) {
             set(4, 'ok', '✅ HTTP ' + r.status + '（' + ms(t4) + '）');
             note('⑤ XHR POST -> ' + r.status);
           }, function (e) {
             set(4, 'bad', '❌ ' + (e && e.message));
             note('⑤ XHR POST 失败: ' + (e && e.message));
+          });
+      })
+      .then(function () {
+        var t5 = performance.now();
+        var f = document.getElementById('fill').value;
+        var body = JSON.stringify({
+          card: '🧪诊断',
+          week: cfg.week || '',
+          body: f + '\n---\n' + location.href + '\n' + navigator.userAgent
+        });
+        return viaFetch({ url: EP, method: 'POST', headers: H(true), body: body })
+          .then(function (r) {
+            set(5, (r.status === 200 || r.status === 201 || r.status === 204) ? 'ok' : 'bad',
+                'HTTP ' + r.status + '（' + ms(t5) + '，' + body.length + ' 字节）');
+            note('⑥ 真实提交 -> ' + r.status + '，' + body.length + ' 字节');
+          }, function (e) {
+            set(5, 'bad', '❌ ' + (e && e.message) + '（' + body.length + ' 字节）');
+            note('⑥ 真实提交失败: ' + (e && (e.name + ' ' + e.message)));
           });
       })
       .then(function () {
@@ -180,6 +208,14 @@
         note('  重测几次才 ✅    = 首连不稳（冷启动握手超时），页面的自动重试能扛住，不影响用');
       });
   }
+
+  // 填一段约 2KB 的中文，模拟真实答案的大小
+  (function () {
+    var unit = '这是一段用来测试提交通道的中文内容，长度接近真实答题卡。';
+    var s = '';
+    while (s.length < 1200) s += unit;
+    document.getElementById('fill').value = s;
+  })();
 
   document.getElementById('again').addEventListener('click', run);
 

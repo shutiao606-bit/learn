@@ -13,17 +13,28 @@
   var T_XHR = 7000;
 
   function configured() {
+    if (cfg.endpoint) return true;          // 自建后端（腾讯云开发）
     return !!(cfg.url && cfg.anonKey &&
               cfg.anonKey !== 'FILL_ME_IN' &&
               String(cfg.url).indexOf('xxxxxxxx') === -1);
   }
 
+  // 两个后端共用一套发送逻辑：
+  //   cfg.endpoint 有值 → 发到自建后端（腾讯云开发云函数）
+  //   否则            → 发到 Supabase
   function url() {
+    if (cfg.endpoint) return cfg.endpoint;
     return String(cfg.url || '').replace(/\/$/, '') + '/rest/v1/answers';
   }
 
   function root() {
+    if (cfg.endpoint) return cfg.endpoint;
     return String(cfg.url || '').replace(/\/$/, '') + '/rest/v1/';
+  }
+
+  // 200 / 201 / 204 都算成功（Supabase 回 201，自建后端回 200）
+  function isOk(st) {
+    return st === 200 || st === 201 || st === 204;
   }
 
   // 预热：页面一打开就先朝服务器打个招呼，把 DNS 和 TLS 握手提前做好。
@@ -46,6 +57,9 @@
   }
 
   function headers(withAuth) {
+    if (cfg.endpoint) {
+      return { 'Content-Type': 'application/json' };
+    }
     var h = {
       'apikey': cfg.anonKey,
       'Content-Type': 'application/json',
@@ -127,13 +141,37 @@
   // 一次请求 + 自动重试（只在"根本没连上"时重试，服务器回错误码不重试）
   // 间隔逐渐拉长：0.8s → 1.5s → 2.5s → 4s，给冷启动的握手留时间
   var GAP = [800, 1500, 2500, 4000, 6000];
+
+  // 每一步都记下来。失败时把这些原样显示出来，才能知道断在哪一跳。
+  var trace = [];
+  function resetTrace() { trace = []; }
+  function traceText() {
+    if (!trace.length) return '（没有记录）';
+    return trace.map(function (x) {
+      return '#' + x.n + ' ' + (x.via || '-') + ' ' + x.ms + 'ms ' +
+             (x.status ? 'HTTP ' + x.status : '× ' + x.err);
+    }).join('\n');
+  }
+
   function send(opt, tries, onRetry) {
     var n = tries || 3;
+    var total = n;
     function go(left) {
-      return once(opt).catch(function (e) {
+      var t0 = Date.now();
+      var idx = total - left + 1;
+      return once(opt).then(function (r) {
+        trace.push({ n: idx, via: r.via, status: r.status, ms: Date.now() - t0 });
+        return r;
+      }, function (e) {
+        trace.push({
+          n: idx,
+          via: '-',
+          err: ((e && e.name) || 'Error') + (e && e.message ? ' ' + e.message : ''),
+          ms: Date.now() - t0
+        });
         if (left <= 1) throw e;
-        if (onRetry) onRetry(n - left + 2, n);
-        var wait = GAP[Math.min(n - left, GAP.length - 1)] || 1500;
+        if (onRetry) onRetry(idx + 1, total);
+        var wait = GAP[Math.min(total - left, GAP.length - 1)] || 1500;
         warm();
         return new Promise(function (r) { setTimeout(r, wait); })
           .then(function () { return go(left - 1); });
@@ -192,7 +230,7 @@
       return send({
         body: JSON.stringify(item.payload)
       }, 1).then(function (r) {
-        if (r.status === 201 || r.status === 204) {
+        if (isOk(r.status)) {
           remove(item.id);
           sent++;
           markDone(item.file);
@@ -210,7 +248,10 @@
     configured: configured,
     url: url,
     warm: warm,
+    isOk: isOk,
     send: send,
+    resetTrace: resetTrace,
+    traceText: traceText,
     outbox: { push: push, remove: remove, count: count, flush: flush, read: readBox },
     inWeChat: function () { return /MicroMessenger/i.test(navigator.userAgent); }
   };

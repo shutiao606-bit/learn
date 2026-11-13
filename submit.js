@@ -76,14 +76,49 @@
     }
   }
 
-  // 前台等不到，就转后台：每 5 秒再试一次，最多 6 次（约 30 秒）。
-  // 成功就贴 ✓，失败就交给本机队列，下次打开页面自动补发。
+  // 失败时把每次尝试的真实结果摊开，并给一键复制——查问题靠这个，不靠猜
+  function showDiag() {
+    var old = document.getElementById('net-diag');
+    if (old) old.parentNode.removeChild(old);
+    var box = document.createElement('div');
+    box.id = 'net-diag';
+    box.className = 'wx-panel';
+    box.innerHTML =
+      '<strong>每次都断在哪：</strong>' +
+      '<pre class="diag-pre">' + Net.traceText() + '</pre>' +
+      '<button type="button" class="copy-diag">复制诊断</button>' +
+      '<p class="hint">答案已经存在本机，不会丢。</p>';
+
+    box.querySelector('.copy-diag').addEventListener('click', function () {
+      var b = this;
+      var text = 'UA: ' + navigator.userAgent + '\n' + Net.traceText();
+      function done(s) { b.textContent = s; setTimeout(function () { b.textContent = '复制诊断'; }, 2000); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done('已复制 ✓'); },
+          function () { done('复制失败'); });
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done('已复制 ✓'); } catch (e) { done('复制失败'); }
+        document.body.removeChild(ta);
+      }
+    });
+
+    var anchor = document.querySelector('.btn-row') || out;
+    anchor.parentNode.insertBefore(box, anchor.nextSibling);
+  }
+
+  // 前台等不到，就转后台继续试：每 3 秒一次，最多 12 次（约 40 秒 + 每次请求耗时）。
+  // 成功就贴 ✓，全失败才交给本机队列，下次打开页面自动补发。
   function keepTrying(boxId, payload, left) {
     if (left <= 0) {
       busy = false;
-      say('答案已存本机。下次打开任意一页会自动补发，不会丢。', false);
+      say('还是没连上。答案已存本机，下次打开任意一页会自动补发。', false);
       btn.textContent = '再次提交';
       btn.disabled = false;
+      showDiag();
       if (Net.inWeChat()) weChatPanel();
       return;
     }
@@ -91,7 +126,7 @@
     setTimeout(function () {
       Net.warm();
       Net.send({ body: JSON.stringify(payload) }, 1).then(function (r) {
-        if (r.status === 201 || r.status === 204) {
+        if (Net.isOk(r.status)) {
           Net.outbox.remove(boxId);
           markDone();
           busy = false;
@@ -106,11 +141,12 @@
           say('服务器拒绝了（HTTP ' + r.status + '）：' + r.text.slice(0, 120), false);
           btn.textContent = '再次提交';
           btn.disabled = false;
+          showDiag();
         }
       }, function () {
         keepTrying(boxId, payload, left - 1);
       });
-    }, 5000);
+    }, 3000);
   }
 
   function submit() {
@@ -134,12 +170,13 @@
     busy = true;
     btn.disabled = true;
     btn.textContent = '提交中…';
+    Net.resetTrace();
     Net.warm();
 
     Net.send({ body: JSON.stringify(payload) }, 3, function (i, n) {
       say('第一下没连上，正在自动重试（' + i + '/' + n + '）…', false);
     }).then(function (r) {
-      if (r.status === 201 || r.status === 204) {
+      if (Net.isOk(r.status)) {
         Net.outbox.remove(boxId);
         markDone();
         busy = false;
