@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>提问与点子</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html">← 主页</a>
+  <span class="where">提问 · 点子</span>
+</header>
+
+<h1>提问与点子</h1>
+<p class="sub">卡住时 3 秒记下来，想到好点子也记下来 ｜ 我开课第一件事就读这个</p>
+
+<h2>一、为什么要先自己问三句</h2>
+<div class="card">
+  <p>不是让你别问。是<strong>会问问题的人，学得比不会问的人快一倍</strong>。</p>
+  <p>"老师，跑不起来"这句话，谁也帮不了你。而下面这种，一句话就能定位：</p>
+  <div class="analogy" style="margin-top:var(--s3)">
+    "我在 WSL 里 <code>cd ~/ros2_ws</code>，报 <code>No such file or directory</code>。<br>
+    我 <code>ls ~</code> 看到的是 <code>ros_ws</code>。<br>
+    我猜是工作空间名字记错了。"
+  </div>
+  <p><strong>所以这个框分四格</strong>：你在做什么 → 实际报什么 → 你猜什么 → 你想问什么。<br>
+  填完这四格，有一半的问题你自己就解决了。</p>
+</div>
+
+<h2>二、提问</h2>
+
+<div class="answer-box">
+  <label>1. 我正在做什么？（一句话，哪张卡、哪一步）</label>
+  <textarea id="q_what" placeholder="在读 ⑤ 的第 3 步，终端里 cd 进 site 目录"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>2. 实际看到了什么？（<strong>报错原文照抄</strong>，别翻译、别总结）</label>
+  <textarea id="q_err" placeholder="屏幕上那几行字，原样贴过来"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>3. 我自己猜是为什么？（猜错也没关系，猜了才有得对）</label>
+  <textarea id="q_guess" placeholder="我猜可能是……"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>4. 我到底想问什么？（一句话）</label>
+  <textarea id="q_ask" placeholder="是不是……？/ 为什么……？/ 下一步该看哪儿？"></textarea>
+</div>
+
+<div class="btn-row">
+  <button class="cloud" onclick="sendAsk()">提交提问</button>
+  <button class="secondary" onclick="clearAsk()">清空</button>
+</div>
+<p class="hint" id="msg_ask"></p>
+
+<h2>三、点子箱</h2>
+<div class="card">
+  <p>学习时冒出来的想法，<strong>不记下来，两小时后就没了</strong>。这个框只问两句：想做什么，想解决什么。</p>
+  <p class="hint">不用写得像方案。一句话就行，剩下的开课时一起想。</p>
+</div>
+
+<div class="answer-box">
+  <label>1. 点子是什么？（一句话）</label>
+  <textarea id="i_idea" placeholder="比如：每天自动把 Anki 里没过的卡整理成一张手机页"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>2. 它解决什么？或者为什么想做？</label>
+  <textarea id="i_why" placeholder="因为……"></textarea>
+</div>
+
+<div class="btn-row">
+  <button class="cloud" onclick="sendIdea()">提交点子</button>
+  <button class="secondary" onclick="clearIdea()">清空</button>
+</div>
+<p class="hint" id="msg_idea"></p>
+
+<div class="todo">
+  <h2>提交之后</h2>
+  <ul>
+    <li>内容直接进云端，<strong>我下次开课第一条就读</strong></li>
+    <li>提问我会批改，但会先让你自己答一遍上面第 3 格</li>
+    <li>点子我会判断：能不能变成一个学习任务；能，就排进后面的周</li>
+  </ul>
+  <p class="hint">如果提交报错（有的浏览器拦请求），说明会把答案存在你手机里，刷新不丢，换微信打开再交一次即可。</p>
+</div>
+
+<p class="foot">手上有问题，先写下来，再纠结</p>
+
+<script src="config.js"></script>
+<script>
+const ASK_IDS = ['q_what', 'q_err', 'q_guess', 'q_ask'];
+const IDEA_IDS = ['i_idea', 'i_why'];
+
+// 草稿本地保存，刷新和切页都不丢
+[...ASK_IDS, ...IDEA_IDS].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const saved = localStorage.getItem('ask_' + id);
+  if (saved) el.value = saved;
+  el.addEventListener('input', () => localStorage.setItem('ask_' + id, el.value));
+});
+
+function say(id, text, ok) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = ok ? '#2f9e44' : '#c92a2a';
+}
+
+function val(id) {
+  return (document.getElementById(id).value || '').trim();
+}
+
+// 和 submit.js 一样的双通道：fetch 被拦就换 XHR
+function post(payload, onDone, onFail) {
+  const cfg = window.SB || {};
+  if (!cfg.url || !cfg.anonKey || cfg.anonKey === 'FILL_ME_IN') {
+    onFail(new Error('还没配置云端'));
+    return;
+  }
+  const endpoint = cfg.url.replace(/\/$/, '') + '/rest/v1/answers';
+  const body = JSON.stringify(payload);
+  const h = {
+    'apikey': cfg.anonKey,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal'
+  };
+
+  function viaXHR(auth) {
+    return new Promise((resolve, reject) => {
+      const x = new XMLHttpRequest();
+      x.open('POST', endpoint, true);
+      x.timeout = 15000;
+      Object.keys(h).forEach(k => x.setRequestHeader(k, h[k]));
+      if (auth) x.setRequestHeader('Authorization', 'Bearer ' + cfg.anonKey);
+      x.onload = () => resolve(x.status);
+      x.onerror = () => reject(new Error('XHR 网络错误'));
+      x.ontimeout = () => reject(new Error('XHR 超时'));
+      x.send(body);
+    });
+  }
+
+  function viaFetch(auth) {
+    const hh = Object.assign({}, h);
+    if (auth) hh['Authorization'] = 'Bearer ' + cfg.anonKey;
+    return fetch(endpoint, { method: 'POST', headers: hh, body: body })
+      .then(r => r.status);
+  }
+
+  function attempt(auth) {
+    return viaFetch(auth)
+      .catch(() => viaXHR(auth))
+      .then(st => (st === 401 || st === 403) && auth ? attempt(false) : st);
+  }
+
+  attempt(true).then(st => {
+    if (st === 201 || st === 204) onDone();
+    else onFail(new Error('服务器返回 ' + st));
+  }).catch(onFail);
+}
+
+function sendAsk() {
+  const what = val('q_what'), err = val('q_err'), guess = val('q_guess'), ask = val('q_ask');
+  if (!ask) { say('msg_ask', '第 4 格还没写：你到底想问什么？', false); return; }
+  const text =
+    '【我在做什么】\n' + (what || '（没写）') + '\n\n' +
+    '【实际报错】\n' + (err || '（没写）') + '\n\n' +
+    '【我猜的原因】\n' + (guess || '（没猜）') + '\n\n' +
+    '【我的问题】\n' + ask;
+  say('msg_ask', '提交中…', true);
+  post({ card: '❓提问', week: (window.SB || {}).week || '', body: text, ua: navigator.userAgent.slice(0, 200) },
+    () => {
+      say('msg_ask', '已提交。开课时我先看这个。', true);
+      [...ASK_IDS].forEach(id => { document.getElementById(id).value = ''; localStorage.removeItem('ask_' + id); });
+    },
+    e => say('msg_ask', '没提交上（' + e.message + '）。内容还在手机上，换微信打开再交一次。', false));
+}
+
+function sendIdea() {
+  const idea = val('i_idea'), why = val('i_why');
+  if (!idea) { say('msg_idea', '第一格还没写。', false); return; }
+  const text = '【点子】\n' + idea + '\n\n【为什么】\n' + (why || '（没写）');
+  say('msg_idea', '提交中…', true);
+  post({ card: '💡点子', week: (window.SB || {}).week || '', body: text, ua: navigator.userAgent.slice(0, 200) },
+    () => {
+      say('msg_idea', '已记下。', true);
+      [...IDEA_IDS].forEach(id => { document.getElementById(id).value = ''; localStorage.removeItem('ask_' + id); });
+    },
+    e => say('msg_idea', '没提交上（' + e.message + '）。内容还在手机上。', false));
+}
+
+function clearAsk() {
+  if (!confirm('清空提问的四个格子？')) return;
+  ASK_IDS.forEach(id => { document.getElementById(id).value = ''; localStorage.removeItem('ask_' + id); });
+  say('msg_ask', '', true);
+}
+
+function clearIdea() {
+  if (!confirm('清空点子？')) return;
+  IDEA_IDS.forEach(id => { document.getElementById(id).value = ''; localStorage.removeItem('ask_' + id); });
+  say('msg_idea', '', true);
+}
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>

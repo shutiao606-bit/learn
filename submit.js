@@ -114,6 +114,9 @@
     attempt(true).then(function (r) {
       if (r.status === 201 || r.status === 204) {
         localStorage.setItem('sb_last_' + document.title, new Date().toISOString());
+        // 标记这张卡"已答"，首页和底部导航会显示 ✓
+        var f = location.pathname.split('/').pop();
+        if (f) localStorage.setItem('done_' + f, new Date().toISOString());
         say('已提交到云端（' + r.via + '）。下次开对话我直接读。', true);
         btn.textContent = '已提交 ✓';
         setTimeout(function () {

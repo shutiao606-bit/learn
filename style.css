@@ -534,3 +534,65 @@ button.cloud { background: #15803d; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* ---------- 上一张 / 下一张 ---------- */
+
+.pager {
+  display: flex;
+  gap: var(--s2);
+  margin: var(--s6) 0 var(--s4);
+}
+.pager a {
+  flex: 1 1 0;
+  min-width: 0;
+  display: block;
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--fg);
+  font-size: .86em;
+  line-height: 1.5;
+  box-shadow: var(--shadow);
+  transition: border-color .15s;
+}
+.pager a:hover { border-color: var(--accent); }
+.pager a.next { text-align: right; }
+.pager a span { display: block; color: var(--muted); font-size: .9em; }
+
+/* 首页卡片的「已答」角标 */
+.nav-card .done-badge {
+  position: absolute;
+  top: 12px;
+  right: 46px;
+  font-size: .72em;
+  font-weight: 700;
+  color: var(--ok);
+}
+
+/* ---------- 热门条目 ---------- */
+
+.hot {
+  border-left: 3px solid var(--accent);
+  padding: 0 0 0 var(--s4);
+  margin: var(--s5) 0;
+}
+.hot h3 { margin: 0 0 var(--s1); font-size: 1em; }
+.hot .why {
+  color: var(--muted);
+  font-size: .88em;
+  margin: var(--s1) 0;
+}
+.hot .meta {
+  font-size: .78em;
+  color: var(--muted);
+}
+.hot .meta a { border-bottom: 1px solid currentColor; }
+
+.db-note {
+  font-size: .8em;
+  color: var(--muted);
+  border-top: 1px dashed var(--line-strong);
+  padding-top: var(--s2);
+  margin-top: var(--s3);
+}
