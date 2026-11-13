@@ -22,6 +22,39 @@
 
   var cur = here();
 
+  // ---- 本机待发队列：能联网就悄悄补发，首页显示还剩几条 ----
+  function pendingNode() {
+    if (cur !== 'index.html' && cur !== '') return null;
+    var card = document.getElementById('progress');
+    if (!card) return null;
+    var p = document.getElementById('pending');
+    if (!p) {
+      p = document.createElement('p');
+      p.id = 'pending';
+      p.className = 'hint';
+      card.appendChild(p);
+    }
+    return p;
+  }
+
+  function showPending() {
+    var n = (window.Net && Net.outbox) ? Net.outbox.count() : 0;
+    if (!n) return;
+    var p = pendingNode();
+    if (p) p.textContent = '还有 ' + n + ' 条答案存在本机、没发出去。联网后打开任意一页会自动补发。';
+  }
+
+  if (window.Net && Net.configured && Net.configured() && Net.outbox.count() > 0) {
+    Net.outbox.flush().then(function (n) {
+      if (n > 0) {
+        var p = pendingNode();
+        if (p) p.textContent = '刚刚补发了 ' + n + ' 条之前没发出去的答案。';
+        setTimeout(showPending, 5000);
+      }
+    });
+  }
+  showPending();
+
   // 首页：给答过的卡片加角标
   if (cur === 'index.html') {
     // 进度环

@@ -1,17 +1,13 @@
-// 把答题卡提交到 Supabase。
-// 没配置 config.js 时，这个按钮根本不会出现，不影响原有「复制」流程。
+// 把答题卡提交到云端。
+// 真正的网络逻辑在 net.js 里；这里只管按钮、提示、和"发不出去怎么办"。
 (function () {
   var cfg = window.SB || {};
+  var Net = window.Net;
   var out = document.getElementById('out');
-  if (!out) return;
+  if (!out || !Net) return;
+  if (!Net.configured()) return;
 
-  var configured = cfg.url && cfg.anonKey &&
-                   cfg.url.indexOf('xxxxxxxx') === -1 &&
-                   cfg.anonKey !== 'FILL_ME_IN';
-  if (!configured) return;
-
-  var endpoint = '';
-  var payload = '';
+  var cardFile = location.pathname.split('/').pop() || '';
 
   function say(text, ok) {
     var msg = document.getElementById('msg');
@@ -29,86 +25,46 @@
     return '';
   }
 
-  function headers(withAuth) {
-    var h = {
-      'apikey': cfg.anonKey,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    };
-    if (withAuth) h['Authorization'] = 'Bearer ' + cfg.anonKey;
-    return h;
-  }
+  // 微信里连不上时，给一个能真的解决问题的出口：把页面地址复制出来
+  function weChatPanel() {
+    var old = document.getElementById('wx-panel');
+    if (old) return;
+    var box = document.createElement('div');
+    box.id = 'wx-panel';
+    box.className = 'wx-panel';
+    box.innerHTML =
+      '<strong>微信里发不出去，两个办法：</strong>' +
+      '<p>① 点右上角「···」→「在浏览器打开」，在那边点「再次提交」</p>' +
+      '<p>② 或者点下面的按钮复制本页链接，粘到浏览器里</p>' +
+      '<button type="button" class="copy-link">复制本页链接</button>' +
+      '<p class="hint">你的答案已经存在这台手机里了，下次打开会自动补发，不会丢。</p>';
 
-  // 通道 A：fetch（标准做法）
-  function viaFetch(h) {
-    var ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
-    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
-    return fetch(endpoint, {
-      method: 'POST',
-      headers: h,
-      body: payload,
-      signal: ctrl ? ctrl.signal : undefined
-    }).then(function (r) {
-      if (timer) clearTimeout(timer);
-      return r.text().then(function (t) {
-        return { status: r.status, text: t, via: 'fetch' };
-      });
-    }, function (e) {
-      if (timer) clearTimeout(timer);
-      throw e;
-    });
-  }
-
-  // 通道 B：XMLHttpRequest。有的国产浏览器（小米/华为/夸克等）
-  // 会拦 fetch 却放过 XHR，所以 A 失败就换 B 再试一次。
-  function viaXHR(h) {
-    return new Promise(function (resolve, reject) {
-      var x = new XMLHttpRequest();
-      x.open('POST', endpoint, true);
-      x.timeout = 7000;
-      for (var k in h) {
-        if (Object.prototype.hasOwnProperty.call(h, k)) x.setRequestHeader(k, h[k]);
+    box.querySelector('.copy-link').addEventListener('click', function () {
+      var link = location.href;
+      var b = this;
+      function done(okText) {
+        b.textContent = okText;
+        setTimeout(function () { b.textContent = '复制本页链接'; }, 2500);
       }
-      x.onload = function () {
-        resolve({ status: x.status, text: x.responseText || '', via: 'xhr' });
-      };
-      x.onerror = function () { reject(new Error('XHR 网络错误')); };
-      x.ontimeout = function () {
-        var e = new Error('XHR 超时');
-        e.name = 'AbortError';
-        reject(e);
-      };
-      x.send(payload);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(function () {
+          done('已复制 ✓');
+        }, function () { done('复制失败，长按地址栏'); });
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = link;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done('已复制 ✓'); }
+        catch (e) { done('复制失败，长按地址栏'); }
+        document.body.removeChild(ta);
+      }
     });
-  }
 
-  function request(withAuth) {
-    var h = headers(withAuth);
-    return viaFetch(h).catch(function () { return viaXHR(h); });
-  }
-
-  function attempt(withAuth) {
-    return request(withAuth).then(function (r) {
-      if ((r.status === 401 || r.status === 403) && withAuth) return request(false);
-      return r;
-    });
-  }
-
-  // 网络层失败（不是服务器回错误码，是根本没连上）自动重试。
-  // 微信/小米这类内置浏览器第一跳常被自己的代理吞掉，隔一秒再来往往就通了。
-  var TOTAL = 3;
-  function attemptWithRetry(n) {
-    return attempt(true).catch(function (e) {
-      if (n <= 1) throw e;
-      say('没连上，正在重试（' + (TOTAL - n + 2) + '/' + TOTAL + '）…', false);
-      return new Promise(function (r) {
-        setTimeout(r, 1500);
-      }).then(function () { return attemptWithRetry(n - 1); });
-    });
-  }
-
-  function inWeChat() {
-    return /MicroMessenger/i.test(navigator.userAgent);
+    var anchor = document.querySelector('.btn-row') || out;
+    anchor.parentNode.insertBefore(box, anchor.nextSibling);
   }
 
   function submit() {
@@ -117,23 +73,29 @@
       say('先答题，或者先点「生成答题卡」。', false);
       return;
     }
-    btn.disabled = true;
-    btn.textContent = '提交中…';
 
-    endpoint = cfg.url.replace(/\/$/, '') + '/rest/v1/answers';
-    payload = JSON.stringify({
+    var payload = {
       card: document.title,
       week: cfg.week || '',
       body: body,
       ua: navigator.userAgent.slice(0, 200)
-    });
+    };
 
-    attemptWithRetry(TOTAL).then(function (r) {
+    // 先落盘，再发送。顺序不能反：这样哪怕马上没网，答案也已经在本机了。
+    var boxId = Net.outbox.push(payload, cardFile);
+
+    btn.disabled = true;
+    btn.textContent = '提交中…';
+
+    Net.send({ body: JSON.stringify(payload) }, 3, function (i, n) {
+      say('没连上，正在重试（' + i + '/' + n + '）…', false);
+    }).then(function (r) {
       if (r.status === 201 || r.status === 204) {
-        localStorage.setItem('sb_last_' + document.title, new Date().toISOString());
-        // 标记这张卡"已答"，首页和底部导航会显示 ✓
-        var f = location.pathname.split('/').pop();
-        if (f) localStorage.setItem('done_' + f, new Date().toISOString());
+        Net.outbox.remove(boxId);
+        try { localStorage.setItem('sb_last_' + document.title, new Date().toISOString()); } catch (e) {}
+        if (cardFile) {
+          try { localStorage.setItem('done_' + cardFile, new Date().toISOString()); } catch (e) {}
+        }
         say('已提交到云端（' + r.via + '）。下次开对话我直接读。', true);
         btn.textContent = '已提交 ✓';
         setTimeout(function () {
@@ -146,15 +108,11 @@
         btn.disabled = false;
       }
     }).catch(function (e) {
-      var why = (e && e.name === 'AbortError')
-        ? '试了 3 次都超时'
-        : '试了 3 次都连不上（' + ((e && e.message) || e) + '）';
-      var fix = inWeChat()
-        ? '点右上角「···」→「在浏览器打开」，那个浏览器通道更稳。'
-        : '答案先点「复制」存一份，等网络好了再点「再次提交」，草稿不会丢。';
-      say(why + '。' + fix, false);
+      var why = (e && e.name === 'AbortError') ? '试了 3 次都超时' : '试了 3 次都连不上';
+      say(why + '，但答案已经存在本机（草稿队列）。', false);
       btn.textContent = '再次提交';
       btn.disabled = false;
+      if (Net.inWeChat()) weChatPanel();
     });
   }
 
@@ -166,4 +124,11 @@
   var row = document.querySelector('.btn-row');
   if (row) row.appendChild(btn);
   else out.parentNode.insertBefore(btn, out);
+
+  // 打开页面时，把上次没发出去的补上
+  if (Net.outbox.count() > 0) {
+    Net.outbox.flush().then(function (n) {
+      if (n > 0) say('上次没发出去的 ' + n + ' 条，刚刚已经补发成功了。', true);
+    });
+  }
 })();

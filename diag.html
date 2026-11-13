@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>网络自检</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html">← 主页</a>
+  <span class="where">网络自检</span>
+</header>
+
+<h1>网络自检</h1>
+<p class="sub">在这个浏览器里跑一遍，看断在哪一步</p>
+
+<div class="card">
+  <p>不用答题、不会存任何东西。只是为了搞清楚：<strong>是你的网络不行，还是这个浏览器不让发？</strong></p>
+  <p class="hint">五项里只要有一项 ✅，就说明网络本身能到 supabase。</p>
+</div>
+
+<h2>结果</h2>
+<div class="card">
+  <table id="res">
+    <tr><td>① 环境</td><td id="r0" class="wait">等待…</td></tr>
+    <tr><td>② 能不能连上</td><td id="r1" class="wait">等待…</td></tr>
+    <tr><td>③ 能不能带钥匙读</td><td id="r2" class="wait">等待…</td></tr>
+    <tr><td>④ fetch 写通道</td><td id="r3" class="wait">等待…</td></tr>
+    <tr><td>⑤ XHR 写通道</td><td id="r4" class="wait">等待…</td></tr>
+  </table>
+  <div class="btn-row">
+    <button type="button" id="again">再测一次</button>
+  </div>
+</div>
+
+<h2>原始信息</h2>
+<div class="card">
+  <p class="hint" id="ua"></p>
+  <pre id="log" style="white-space:pre-wrap;word-break:break-all;font-size:13px"></pre>
+  <div class="btn-row">
+    <button type="button" id="copy">复制结果</button>
+  </div>
+</div>
+
+<style>
+.wait { color: var(--muted, #868e96); }
+.ok   { color: #2f9e44; font-weight: 600; }
+.bad  { color: #c92a2a; font-weight: 600; }
+</style>
+
+<p class="foot">自检页 · 查完可以关掉</p>
+
+<script src="config.js"></script>
+<script>
+(function () {
+  var cfg = window.SB || {};
+  var base = String(cfg.url || '').replace(/\/$/, '');
+  var key = cfg.anonKey || '';
+  var log = [];
+
+  function set(i, cls, text) {
+    var el = document.getElementById('r' + i);
+    el.className = cls;
+    el.textContent = text;
+  }
+  function note(s) { log.push(s); document.getElementById('log').textContent = log.join('\n'); }
+  function ms(t0) { return Math.round(performance.now() - t0) + 'ms'; }
+
+  function viaFetch(o) {
+    var ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
+    return fetch(o.url, {
+      method: o.method || 'POST',
+      headers: o.headers,
+      body: o.body,
+      mode: o.mode || 'cors',
+      cache: 'no-store',
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function (r) {
+      if (timer) clearTimeout(timer);
+      return { status: r.status, via: 'fetch' };
+    }, function (e) {
+      if (timer) clearTimeout(timer);
+      throw e;
+    });
+  }
+
+  function viaXHR(o) {
+    return new Promise(function (res, rej) {
+      var x = new XMLHttpRequest();
+      x.open(o.method || 'POST', o.url, true);
+      x.timeout = 7000;
+      for (var k in (o.headers || {})) x.setRequestHeader(k, o.headers[k]);
+      x.onload = function () { res({ status: x.status, via: 'xhr' }); };
+      x.onerror = function () { rej(new Error('XHR 网络错误')); };
+      x.ontimeout = function () { rej(new Error('XHR 超时')); };
+      x.send(o.body === undefined ? null : o.body);
+    });
+  }
+
+  function H(auth) {
+    var h = { 'apikey': key, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+    if (auth) h['Authorization'] = 'Bearer ' + key;
+    return h;
+  }
+
+  function run() {
+    log = [];
+    document.getElementById('log').textContent = '';
+    ['r0', 'r1', 'r2', 'r3', 'r4'].forEach(function (id) {
+      document.getElementById(id).className = 'wait';
+      document.getElementById(id).textContent = '等待…';
+    });
+
+    // ① 环境
+    set(0, 'ok', '页面能加载（这一步必然通）');
+    document.getElementById('ua').textContent = navigator.userAgent;
+    note('URL: ' + location.href);
+    note('UA: ' + navigator.userAgent);
+    note('fetch: ' + (typeof fetch) + ' / XHR: ' + (typeof XMLHttpRequest) +
+         ' / AbortController: ' + (typeof AbortController));
+    note('endpoint: ' + base + '/rest/v1/answers');
+
+    // ② 纯连通性：no-cors GET 根路径。它会回 401，但能收到响应就说明网络通
+    var t = performance.now();
+    viaFetch({ url: base + '/rest/v1/', method: 'GET', mode: 'no-cors' })
+      .then(function () {
+        set(1, 'ok', '✅ 能连上（' + ms(t) + '）');
+        note('② no-cors GET 到达');
+      }, function (e) {
+        set(1, 'bad', '❌ 完全连不上（' + ms(t) + '）：' + (e && e.message));
+        note('② no-cors GET 失败: ' + (e && (e.name + ' ' + e.message)));
+      })
+      // ③ 带钥匙读：验证 CORS 预检 + apikey
+      .then(function () {
+        var t2 = performance.now();
+        return viaFetch({
+          url: base + '/rest/v1/answers?select=id&limit=1',
+          method: 'GET',
+          headers: H(true)
+        }).then(function (r) {
+          set(2, 'ok', '✅ HTTP ' + r.status + '（' + ms(t2) + '）');
+          note('③ GET answers -> ' + r.status);
+        }, function (e) {
+          set(2, 'bad', '❌ ' + (e && e.message));
+          note('③ GET answers 失败: ' + (e && (e.name + ' ' + e.message)));
+        });
+      })
+      // ④ fetch 写通道：故意发空 body，服务器会回 400，但能收到 400 就说明通道通
+      .then(function () {
+        var t3 = performance.now();
+        return viaFetch({ url: base + '/rest/v1/answers', method: 'POST', headers: H(true), body: '' })
+          .then(function (r) {
+            set(3, 'ok', '✅ HTTP ' + r.status + '（' + ms(t3) + '）');
+            note('④ fetch POST -> ' + r.status);
+          }, function (e) {
+            set(3, 'bad', '❌ ' + (e && e.message));
+            note('④ fetch POST 失败: ' + (e && (e.name + ' ' + e.message)));
+          });
+      })
+      // ⑤ XHR 写通道
+      .then(function () {
+        var t4 = performance.now();
+        return viaXHR({ url: base + '/rest/v1/answers', method: 'POST', headers: H(true), body: '' })
+          .then(function (r) {
+            set(4, 'ok', '✅ HTTP ' + r.status + '（' + ms(t4) + '）');
+            note('⑤ XHR POST -> ' + r.status);
+          }, function (e) {
+            set(4, 'bad', '❌ ' + (e && e.message));
+            note('⑤ XHR POST 失败: ' + (e && e.message));
+          });
+      })
+      .then(function () {
+        note('');
+        note('结论怎么看：② 就 ❌ = 网络到不了 supabase；② ✅ 但 ④⑤ 都 ❌ = 浏览器拦了跨域请求。');
+      });
+  }
+
+  document.getElementById('again').addEventListener('click', run);
+
+  document.getElementById('copy').addEventListener('click', function () {
+    var text = document.getElementById('ua').textContent + '\n\n' +
+      document.getElementById('log').textContent;
+    var b = this;
+    function done(s) { b.textContent = s; setTimeout(function () { b.textContent = '复制结果'; }, 2000); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done('已复制 ✓'); },
+        function () { done('复制失败'); });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done('已复制 ✓'); } catch (e) { done('复制失败'); }
+      document.body.removeChild(ta);
+    }
+  });
+
+  run();
+})();
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>
