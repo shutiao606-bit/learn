@@ -135,12 +135,16 @@ function post(payload, onDone, onFail) {
     return new Promise((resolve, reject) => {
       const x = new XMLHttpRequest();
       x.open('POST', endpoint, true);
-      x.timeout = 15000;
+      x.timeout = 7000;
       Object.keys(h).forEach(k => x.setRequestHeader(k, h[k]));
       if (auth) x.setRequestHeader('Authorization', 'Bearer ' + cfg.anonKey);
       x.onload = () => resolve(x.status);
       x.onerror = () => reject(new Error('XHR 网络错误'));
-      x.ontimeout = () => reject(new Error('XHR 超时'));
+      x.ontimeout = () => {
+        const e = new Error('超时');
+        e.name = 'AbortError';
+        reject(e);
+      };
       x.send(body);
     });
   }
@@ -148,8 +152,18 @@ function post(payload, onDone, onFail) {
   function viaFetch(auth) {
     const hh = Object.assign({}, h);
     if (auth) hh['Authorization'] = 'Bearer ' + cfg.anonKey;
-    return fetch(endpoint, { method: 'POST', headers: hh, body: body })
-      .then(r => r.status);
+    const ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), 8000) : null;
+    return fetch(endpoint, {
+      method: 'POST', headers: hh, body: body,
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(r => {
+      if (timer) clearTimeout(timer);
+      return r.status;
+    }, e => {
+      if (timer) clearTimeout(timer);
+      throw e;
+    });
   }
 
   function attempt(auth) {
@@ -158,10 +172,25 @@ function post(payload, onDone, onFail) {
       .then(st => (st === 401 || st === 403) && auth ? attempt(false) : st);
   }
 
-  attempt(true).then(st => {
+  // 连不上就自动重试 3 次：微信内置浏览器第一跳常被自己的代理吞掉
+  function attemptWithRetry(n) {
+    return attempt(true).catch(e => {
+      if (n <= 1) throw e;
+      return new Promise(r => setTimeout(r, 1500)).then(() => attemptWithRetry(n - 1));
+    });
+  }
+
+  attemptWithRetry(3).then(st => {
     if (st === 201 || st === 204) onDone();
     else onFail(new Error('服务器返回 ' + st));
-  }).catch(onFail);
+  }).catch(e => {
+    const wx = /MicroMessenger/i.test(navigator.userAgent);
+    const hint = wx
+      ? '点右上角「···」→「在浏览器打开」再试'
+      : '内容还在框里，等网络好了点「发送」就行';
+    const err = new Error(((e && e.message) || '连不上') + '（试了 3 次）。' + hint);
+    onFail(err);
+  });
 }
 
 function sendAsk() {

@@ -14,12 +14,12 @@
 </header>
 
 <h1>本周热门</h1>
-<p class="sub">第 1 期 ｜ 2026-11-13 更新 ｜ 每周日刷新一次</p>
+<p class="sub">第 1 期 ｜ 2026-11-13 更新 ｜ 每周日刷新</p>
 
 <h2>这页是干什么的</h2>
 <div class="card">
   <p>一个人闷头学，最大的风险不是学得慢，是<strong>学了半年才发现方向早就变了</strong>。</p>
-  <p>所以每周花 <strong>10 分钟</strong>，看一眼无人机集群和具身智能这个圈子里，这周在发生什么。</p>
+  <p>所以每周花 <strong>10 分钟</strong>，看一眼这个圈子里在发生什么。</p>
   <p><strong>三条规则：</strong></p>
   <ol>
     <li>只看和主线有关的，别的刷到也划走</li>
@@ -28,54 +28,148 @@
   </ol>
 </div>
 
+<h2>先学会一件事：看目录</h2>
+<div class="card">
+  <p>下面每个项目，我都给了<strong>顶层目录</strong>。这不是凑字数——<strong>看目录是一个项目最快的读法</strong>。</p>
+  <p>一个成熟仓库的目录名，基本就说明了它的世界观：</p>
+  <table>
+    <tr><th>看到这个</th><th>大概率放什么</th></tr>
+    <tr><td><code>src/</code></td><td>真正的源代码</td></tr>
+    <tr><td><code>docs/</code> <code>start_here/</code></td><td>给人看的说明。愿意写这个的，通常比较成熟</td></tr>
+    <tr><td><code>scripts/</code></td><td>一次性小工具，装环境、批量跑</td></tr>
+    <tr><td><code>tests/</code></td><td>自动检查代码有没有坏</td></tr>
+    <tr><td><code>examples/</code> <code>baselines/</code></td><td>可以直接照着跑的样例</td></tr>
+  </table>
+  <p class="hint">这跟你第 1 周学的「路径与目录」是同一件事：<strong>目录结构 = 作者脑子里的结构</strong>。</p>
+</div>
+
 <h2>本期 5 条</h2>
 
 <div class="hot">
-  <h3>1. aerial-autonomy-stack —— 集群仿真到真机的一站式栈</h3>
-  <p class="why"><strong>是什么：</strong>把 PX4/ArduPilot 的多机仿真、ROS2、YOLO 视觉、激光雷达、Jetson 部署串在一起的开源项目。</p>
-  <p class="why"><strong>为什么和你有关：</strong>这几乎就是你 6 周之后要<strong>自己一步步搭出来的东西</strong>。现在先看一眼它的目录结构，你就知道终点长什么样，学基础的时候心里有底。</p>
-  <p class="meta">这周能做的：只看 README 的文件夹列表，5 分钟 ｜ <a href="https://github.com/JacopoPan/aerial-autonomy-stack" target="_blank" rel="noopener">GitHub</a></p>
+  <h3>1. aerial-autonomy-stack（AAS）</h3>
+  <p class="meta">660 ★ ｜ C++ ｜ 最后更新 2026-11-12（就是昨天）｜ <a href="https://github.com/JacopoPan/aerial-autonomy-stack" target="_blank" rel="noopener">GitHub</a></p>
+
+  <p class="why"><strong>它是什么：</strong>一个"电池已装好"的无人机自主性开发栈。官方介绍就三句话：<strong>开发</strong>多机自主（PX4 / ArduPilot / Betaflight）、<strong>仿真</strong>感知与控制（YOLO + 3D 激光雷达，快于实时）、<strong>部署</strong>到真机（JetPack / DeepStream / NVIDIA Orin）。</p>
+
+  <p class="why"><strong>顶层目录说明了什么：</strong></p>
+  <table>
+    <tr><td><code>start_here/</code></td><td>入门文档，里面有 BOM（物料清单）和"为什么这么设计"的说明</td></tr>
+    <tr><td><code>aircraft/</code></td><td>机型：四旋翼、垂直起降（VTOL）、尾座式、固定翼</td></tr>
+    <tr><td><code>simulation/</code></td><td>仿真世界的配置</td></tr>
+    <tr><td><code>ground/</code></td><td>地面侧的东西（监控、地面站）</td></tr>
+    <tr><td><code>aas-gym/</code></td><td>强化学习训练环境，按 gymnasium 的接口做</td></tr>
+  </table>
+
+  <p class="why"><strong>为什么和你有关：</strong>这就是<strong>你 6 周之后要一步步自己搭出来的东西的"标准答案版本"</strong>。你现在不用懂它，但可以先认识这几个词：PX4 是飞控、Gazebo 是仿真世界、YOLO 是视觉、Jetson 是机载小电脑——<strong>这四个词会陪你走完整个研一</strong>。</p>
+
+  <p class="why"><strong>这周能做什么（5 分钟）：</strong>只看 <code>start_here/</code> 里那份 BOM。那是"造一台能自主飞的四旋翼要买什么"，看完你会第一次有"这东西有实体的"的感觉。</p>
 </div>
 
 <div class="hot">
-  <h3>2. Langostino —— ROS2 + AI 的自主无人机参考平台</h3>
-  <p class="why"><strong>是什么：</strong>一个用 ROS2 搭的自主飞行参考实现，11 月 4 日还在更新。</p>
-  <p class="why"><strong>为什么和你有关：</strong>它的价值不在代码，在<strong>目录怎么分</strong>：传感器、控制、规划、感知各放哪。以后你建自己的工作空间时，照着这个骨架走，少走半年弯路。</p>
-  <p class="meta">这周能做的：看它的顶层文件夹名，猜猜每个是干什么的 ｜ <a href="https://github.com/swarm-subnet/Langostino" target="_blank" rel="noopener">GitHub</a></p>
+  <h3>2. Langostino</h3>
+  <p class="meta">553 ★ ｜ Python ｜ 最后更新 2026-02 ｜ <a href="https://github.com/swarm-subnet/Langostino" target="_blank" rel="noopener">GitHub</a></p>
+
+  <p class="why"><strong>它是什么：</strong>一个用 ROS2 + AI 做自主飞行的开源参考平台，目标是"一个能读懂、能复制、能改"的真实无人机自主系统。</p>
+
+  <p class="why"><strong>顶层目录说明了什么：</strong></p>
+  <table>
+    <tr><td><code>src/</code></td><td>核心代码</td></tr>
+    <tr><td><code>model/</code></td><td>训练好的模型文件</td></tr>
+    <tr><td><code>scripts/</code></td><td>装环境、启动用的脚本</td></tr>
+    <tr><td><code>mapproxy/</code></td><td>地图服务（它需要地理数据）</td></tr>
+    <tr><td><code>inav-custom-firmware/</code></td><td><strong>自己改过的飞控固件</strong></td></tr>
+  </table>
+
+  <p class="why"><strong>最有价值的一点，不在代码里：</strong>它走的是<strong>树莓派 + iNav 固件 + GPS + 激光雷达</strong>这条路，而不是 PX4。<br>
+  也就是说，同样叫"无人机自主飞行"，业界至少有<strong>两种完全不同的搭法</strong>：一种是 AAS 那种 PX4/ROS2 的重型方案，一种是 Langostino 这种树莓派上的轻量方案。<strong>知道有两条路，比只会一条重要得多。</strong></p>
+
+  <p class="why"><strong>这周能做什么（5 分钟）：</strong>把它的顶层目录和上面 AAS 的顶层目录对照着看。同样是无人机项目，为什么这边有 <code>mapproxy/</code> 和 <code>model/</code>，那边有 <code>simulation/</code> 和 <code>aircraft/</code>？<strong>这个差别，就是两条路线的差别。</strong></p>
+
+  <p class="hint">注意：这个仓库 2026 年 2 月之后没再更新，相对不活跃。它适合用来"看结构"，不适合当"跟着做"的教程。</p>
 </div>
 
 <div class="hot">
-  <h3>3. FlowPilot —— 让无人机"边想边飞"的世界模型（北理工，11 月 2 日接收）</h3>
-  <p class="why"><strong>是什么：</strong>一篇把世界模型（world-action model）用在小无人机敏捷导航上的论文，作者来自北理工等，代码承诺开源。</p>
-  <p class="why"><strong>为什么和你有关：</strong>这正是"集群 + 具身智能"的交汇地带——不是先感知再规划再控制的三段式，而是<strong>一个模型直接吐动作</strong>。跟你以后要碰的 VLA 是同一套思路。</p>
-  <p class="meta">这周能做的：只看摘要最后两行结论 ｜ <a href="https://arxiv.org/abs/2608.00635" target="_blank" rel="noopener">arXiv</a></p>
+  <h3>3. FlowPilot —— 让无人机"边想边飞"（论文）</h3>
+  <p class="meta">arXiv 预印本 ｜ 2026-11-02 接收 ｜ 北京理工大学等 ｜ <a href="https://arxiv.org/abs/2608.00635" target="_blank" rel="noopener">arXiv</a></p>
+
+  <p class="why"><strong>它是什么：</strong>一篇讲"敏捷无人机导航"的论文，用的是<strong>世界-动作模型</strong>（world-action model）的路子：不再拆成"先感知、再规划、再控制"三段，而是让一个模型<strong>直接输出该怎么飞</strong>。作者承诺开源代码。</p>
+
+  <p class="why"><strong>为什么这个思路值得你知道：</strong></p>
+  <ul>
+    <li>传统无人机自主：<strong>感知 → 规划 → 控制</strong>，三个模块，接口清晰，但中间每一环都可能丢信息</li>
+    <li>大模型这一派：<strong>看到画面，直接给出动作</strong>，中间不拆</li>
+    <li>这就是"具身智能"进到无人机领域的方式，也是你说的 VLA 的同一个思路</li>
+  </ul>
+
+  <p class="why"><strong>为什么和你有关：</strong>你的方向是<strong>集群 + VLA</strong>。这类工作就是那个交叉点上的东西。<strong>你现在不需要看懂方法，只需要知道：这个圈子里有一批人正在把"大模型直接控制无人机"这件事往前推。</strong>等你到 VLA 小项目时，你会回来找这类论文。</p>
+
+  <p class="why"><strong>这周能做什么（3 分钟）：</strong>只看摘要的第一句和最后一句结论。看不动没关系——<strong>能感觉到"看不懂但知道它在干什么"，就已经是进步了。</strong></p>
 </div>
 
 <div class="hot">
-  <h3>4. Xiaomi-Robotics-0 —— 开源的机器人大模型（背景补课）</h3>
-  <p class="why"><strong>是什么：</strong>小米今年 2 月开源的 VLA 模型，约 47 亿参数，Apache-2.0，权重公开。结构上是"视觉语言大脑 + 扩散动作专家"，专门为实时性做了优化。</p>
-  <p class="why"><strong>为什么和你有关：</strong>这是国内目前最有代表性的开源 VLA 之一。<strong>知道它存在</strong>就够了——等你做到 VLA 小项目时，这类模型会是你的起点，而不是从零训练。</p>
-  <p class="meta">这周能做的：记住一句话——<strong>开源 VLA 已经是"拿来微调"，不是"从头造"</strong> ｜ <a href="https://arxiv.org/abs/2602.12684" target="_blank" rel="noopener">arXiv</a></p>
+  <h3>4. Xiaomi-Robotics-0 —— 国内开源 VLA 的代表（背景补课）</h3>
+  <p class="meta">2026-02 开源 ｜ 约 47 亿参数 ｜ Apache-2.0 ｜ <a href="https://arxiv.org/abs/2602.12684" target="_blank" rel="noopener">arXiv</a></p>
+
+  <p class="why"><strong>它是什么：</strong>小米的第一代机器人 VLA 大模型，代码和权重都开源了。结构上是"<strong>视觉语言大脑 + 扩散动作专家</strong>"：一个模型负责看懂画面和指令，另一个负责把"要干什么"变成平滑连续的动作。</p>
+
+  <p class="why"><strong>它解决什么问题：</strong>机器人在真实环境里做动作，最怕的是<strong>卡顿和抖动</strong>——模型算得再准，动作一卡一顿也没法用。这类工作很大一部分精力花在"怎么让动作连贯、实时"上，而不是"怎么更聪明"。</p>
+
+  <p class="why"><strong>为什么和你有关：</strong>这是目前国内最有代表性的开源 VLA 之一。你要记住的最重要一句话是：</p>
+  <div class="analogy" style="margin-top:var(--s2)">
+    <strong>2026 年做 VLA，不是"从头造一个模型"，是"拿一个开源模型来微调"。</strong>
+  </div>
+  <p class="why">这直接决定了你以后小项目的样子：不是训练，而是<strong>准备数据 → 微调 → 部署 → 评估</strong>。现在知道这一点，你学 Python 和数据处理的时候会更有方向感。</p>
+
+  <p class="why"><strong>这周能做什么（2 分钟）：</strong>什么都别做，就记住上面那句话。</p>
 </div>
 
 <div class="hot">
-  <h3>5. Psi-Zero —— 人形机器人的 VLA，RSS'26 收录</h3>
-  <p class="why"><strong>是什么：</strong>一个人形机器人 VLA 项目，基于 LeRobot 生态，训练和部署工具链一起开源。</p>
-  <p class="why"><strong>为什么和你有关：</strong>你的课题里有<strong>双机械臂</strong>。人形 VLA 和双臂操作在"双手协调"这一层是通的，以后查资料时这是关键词之一。</p>
-  <p class="meta">这周能做的：知道 <code>LeRobot</code> 这个词，以后会反复见到 ｜ <a href="https://github.com/physical-superintelligence-lab/Psi0" target="_blank" rel="noopener">GitHub</a></p>
+  <h3>5. Psi0（Ψ₀）—— 人形机器人 VLA，RSS'26 收录</h3>
+  <p class="meta">2887 ★ ｜ Python ｜ 最后更新 2026-11-11 ｜ <a href="https://github.com/physical-superintelligence-lab/Psi0" target="_blank" rel="noopener">GitHub</a> ｜ <a href="https://arxiv.org/abs/2603.12263" target="_blank" rel="noopener">arXiv</a></p>
+
+  <p class="why"><strong>它是什么：</strong>一个人形机器人的开源基础模型，目标是"通用的全身移动 + 操作"（loco-manipulation）。仓库里带了模型、数据、训练脚本和 Docker 配置。</p>
+
+  <p class="why"><strong>顶层目录说明了什么：</strong></p>
+  <table>
+    <tr><td><code>src/</code></td><td>模型与训练代码</td></tr>
+    <tr><td><code>real/</code></td><td>真机部署部分（和仿真分开写，这是个好习惯）</td></tr>
+    <tr><td><code>baselines/</code></td><td>对照方法，用来证明"我这版更好"</td></tr>
+    <tr><td><code>docker-compose.yml</code></td><td>一键把环境跑起来</td></tr>
+    <tr><td><code>flake.nix</code> <code>nix/</code></td><td>另一种环境固化方式（更硬核，知道有这么回事就行）</td></tr>
+  </table>
+
+  <p class="why"><strong>为什么和你有关：</strong>你的课题里有<strong>双机械臂</strong>。人形 VLA 和双臂操作，在"两只手怎么配合"这一层是相通的。以后你查资料，<code>loco-manipulation</code>、<code>dual-arm</code>、<code>bimanual</code> 这几个词会反复出现。</p>
+
+  <p class="why"><strong>另外注意一个细节：</strong>它把 <code>real/</code>（真机）和仿真代码分开放在顶层。这是个很成熟的工程习惯——<strong>真机代码和仿真代码混在一起，早晚出事</strong>。你现在不用照做，先记住这个分法。</p>
+
+  <p class="why"><strong>这周能做什么（5 分钟）：</strong>看 README 里的动图或视频链接，感受一下"人形机器人 VLA"现在能做到什么程度。</p>
 </div>
 
 <h2>一句话连回你这周</h2>
 <div class="card">
   <p>这五条看着离你很远，其实都站在<strong>同一个地基</strong>上：</p>
-  <p>上周你学的 PX4、Gazebo、YOLO 节点，都是<strong>独立进程</strong>，靠<strong>话题</strong>和<strong>端口</strong>互相说话。上面这些项目，说到底就是<strong>把这些进程组织得更好</strong>。</p>
-  <p>所以这周读 ③ 进程、④ 路径的时候，不用觉得"这跟无人机有什么关系"——<strong>关系就是：所有这些项目跑起来之后，你都要靠这几样本事去认它们、停它们、修它们。</strong></p>
+  <p>上周你学的 PX4、Gazebo、YOLO 节点，都是<strong>独立进程</strong>，靠<strong>话题</strong>和<strong>端口</strong>互相说话。上面这些项目，说到底就是<strong>把这些进程组织得更好</strong>——目录怎么分、谁先启动、出错怎么查。</p>
+  <p>所以这周读 ③ 进程、④ 路径的时候，别觉得"跟无人机没关系"。关系就是：<strong>所有这些项目跑起来之后，你都要靠这几样本事去认它们、停它们、修它们。</strong></p>
+</div>
+
+<h2>术语小抄（看不懂论文时翻这里）</h2>
+<div class="card">
+  <table>
+    <tr><th>词</th><th>一句话</th></tr>
+    <tr><td><strong>PX4</strong></td><td>开源飞控软件，管飞机怎么稳定地飞</td></tr>
+    <tr><td><strong>SITL</strong></td><td>软件在环：飞控跑在电脑里，接仿真世界</td></tr>
+    <tr><td><strong>HITL</strong></td><td>硬件在环：真飞控板接电脑仿真</td></tr>
+    <tr><td><strong>VLA</strong></td><td>视觉-语言-动作模型：看画面 + 听指令 → 出动作</td></tr>
+    <tr><td><strong>世界模型</strong></td><td>模型先在"脑内"预测未来几帧，再决定怎么动</td></tr>
+    <tr><td><strong>sim2real</strong></td><td>仿真里学会的，搬到真机上还能用</td></tr>
+    <tr><td><strong>loco-manipulation</strong></td><td>一边走一边操作（人形机器人的核心难题）</td></tr>
+  </table>
 </div>
 
 <h2>怎么更新</h2>
 <div class="card">
-  <p>每周日你打开电脑，我搜一遍当周的热门项目、论文和版本更新，挑 3～5 条写进这一页，然后推到 GitHub Pages。</p>
-  <p class="hint">往期内容会留在这一页下方（从第 2 期开始）。</p>
+  <p>每周日你打开电脑，我搜一遍当周的热门项目和论文，挑 3～5 条写进这一页，然后推到 GitHub Pages。</p>
+  <p class="hint">往期内容从第 2 期开始，会留在这页下方。</p>
 </div>
 
 <p class="foot">第 1 期 · 2026-11-13</p>

@@ -42,7 +42,7 @@
   // 通道 A：fetch（标准做法）
   function viaFetch(h) {
     var ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
-    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 20000) : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
     return fetch(endpoint, {
       method: 'POST',
       headers: h,
@@ -65,7 +65,7 @@
     return new Promise(function (resolve, reject) {
       var x = new XMLHttpRequest();
       x.open('POST', endpoint, true);
-      x.timeout = 15000;
+      x.timeout = 7000;
       for (var k in h) {
         if (Object.prototype.hasOwnProperty.call(h, k)) x.setRequestHeader(k, h[k]);
       }
@@ -94,6 +94,23 @@
     });
   }
 
+  // 网络层失败（不是服务器回错误码，是根本没连上）自动重试。
+  // 微信/小米这类内置浏览器第一跳常被自己的代理吞掉，隔一秒再来往往就通了。
+  var TOTAL = 3;
+  function attemptWithRetry(n) {
+    return attempt(true).catch(function (e) {
+      if (n <= 1) throw e;
+      say('没连上，正在重试（' + (TOTAL - n + 2) + '/' + TOTAL + '）…', false);
+      return new Promise(function (r) {
+        setTimeout(r, 1500);
+      }).then(function () { return attemptWithRetry(n - 1); });
+    });
+  }
+
+  function inWeChat() {
+    return /MicroMessenger/i.test(navigator.userAgent);
+  }
+
   function submit() {
     var body = buildText();
     if (!body || body.length < 5) {
@@ -111,7 +128,7 @@
       ua: navigator.userAgent.slice(0, 200)
     });
 
-    attempt(true).then(function (r) {
+    attemptWithRetry(TOTAL).then(function (r) {
       if (r.status === 201 || r.status === 204) {
         localStorage.setItem('sb_last_' + document.title, new Date().toISOString());
         // 标记这张卡"已答"，首页和底部导航会显示 ✓
@@ -130,9 +147,12 @@
       }
     }).catch(function (e) {
       var why = (e && e.name === 'AbortError')
-        ? '两种通道都超时，这台设备连不上 supabase.co'
-        : '连不上 supabase.co（' + ((e && e.message) || e) + '）';
-      say(why + '。答案先点「复制」存一份，或换微信打开本页再提交。', false);
+        ? '试了 3 次都超时'
+        : '试了 3 次都连不上（' + ((e && e.message) || e) + '）';
+      var fix = inWeChat()
+        ? '点右上角「···」→「在浏览器打开」，那个浏览器通道更稳。'
+        : '答案先点「复制」存一份，等网络好了再点「再次提交」，草稿不会丢。';
+      say(why + '。' + fix, false);
       btn.textContent = '再次提交';
       btn.disabled = false;
     });
