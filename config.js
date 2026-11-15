@@ -8,9 +8,9 @@
 //    secret / service_role 那把只放在电脑本地 tools/supabase.env。
 // ============================================================
 window.SB = {
-  // 腾讯云开发「HTTP 访问服务」给的地址，形如：
-  // https://xxx.service.tcloudbase.com/submit
-  endpoint: '',
+  // 腾讯云开发「HTTP 访问服务」的地址（2026-11-15 启用）
+  // 指向云函数 scf-nodejs-helloworld-7tm4，写进 PostgreSQL 的 public.answers
+  endpoint: 'https://learn-d0ggmjikx9cd0cf46-1531867618.ap-shanghai.app.tcloudbase.com/submit',
 
   // 旧后端（国内访问不稳定，保留作备用）
   url: 'https://tajfkquemrkjmvbqdeya.supabase.co',
