@@ -849,3 +849,77 @@ button.secondary {
   font-size: .95em;
 }
 .rv-q { font-size: 1.02em; line-height: 1.6; margin: var(--s2) 0; }
+
+/* ---------- 术语词典 ---------- */
+.search-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: var(--s2) 0;
+  margin-bottom: var(--s2);
+  background: var(--bg);
+}
+.search-wrap input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--fg);
+  font-family: inherit;
+}
+.gloss { padding: var(--s2) var(--s4); }
+.term {
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+}
+.term:last-child { border-bottom: 0; }
+.term dt {
+  font-weight: 600;
+  font-size: 1em;
+  margin-bottom: 4px;
+}
+.term dd {
+  margin: 0;
+  font-size: .95em;
+  line-height: 1.7;
+  color: var(--fg);
+}
+.term .ana {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: .92em;
+}
+
+/* ---------- 每日一述 ---------- */
+.oral-q h3 {
+  margin: var(--s2) 0 0;
+  font-size: 1.15em;
+  line-height: 1.6;
+}
+.oral-clock {
+  margin: 0 0 var(--s2);
+  font-size: 2.6em;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+.oral-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.oral-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #7c5cff);
+  transition: width 1s linear;
+}
+.oral-hist { margin: 0; padding-left: 1.1em; line-height: 1.9; }
+.oral-hist li { margin: 0; }

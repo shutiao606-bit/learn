@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.json">
+<title>论文卡</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html">← 主页</a>
+  <span class="where">论文卡</span>
+</header>
+
+<h1>论文卡</h1>
+<p class="sub">练手用的文献清单 ｜ 每条都写清"什么时候该读"</p>
+
+<h2>先学会怎么读（10 分钟版）</h2>
+<div class="card">
+  <p>论文不是从第一页读到最后。手机上按这个顺序，<strong>10 分钟能判断一篇值不值得细读</strong>：</p>
+  <ol>
+    <li><strong>标题 + 摘要最后一句</strong> —— 它说自己的贡献是什么</li>
+    <li><strong>图 1</strong> —— 几乎所有论文的第一张图都在讲"整体思路"，比正文好懂</li>
+    <li><strong>结论最后一段</strong> —— 作者自己承认的局限，往往就是下一篇论文的入口</li>
+    <li><strong>方法只看框图</strong> —— 别抠公式，先看数据从哪进、从哪里出</li>
+  </ol>
+  <p class="hint">看完这四步还说不清"它解决什么问题"，就关掉——不是你的问题，是这篇现在还不属于你。</p>
+</div>
+
+<div class="analogy">
+  <strong>「现在不读」也是一种结论。</strong>研一最浪费时间的动作，是硬啃一篇还不需要的论文，然后什么都没剩下。
+</div>
+
+<h2>清单</h2>
+
+<div class="hot">
+  <h3>1. Diffusion Policy ｜ 动作块的开山之作</h3>
+  <p class="meta">2023 ｜ 哥伦比亚 / MIT ｜ <a href="https://arxiv.org/abs/2303.04137" target="_blank" rel="noopener">arXiv 2303.04137</a></p>
+
+  <p class="why"><strong>一句话：</strong>把机器人动作生成做成"从噪声里一步步去噪"，并且一次输出一小段连续动作（动作块），而不是单个动作点。</p>
+  <p class="why"><strong>解决什么：</strong>同一个场景下往往有<strong>多种合理做法</strong>（从左边绕还是右边绕），传统回归会把这些平均成一个都不像的动作。扩散能保留这种"多解"。</p>
+  <p class="why"><strong>和你什么有关：</strong>现在几乎所有 VLA 的"动作头"都是这个思路的后代，包括下面要讲的 π0。<strong>先懂这个，后面的 VLA 才看得懂。</strong></p>
+  <p class="why"><strong>什么时候读：</strong>做完第 6 周之后，<strong>2027 年初</strong>，准备接触 VLA 小项目时。现在别读。</p>
+</div>
+
+<div class="hot">
+  <h3>2. OpenVLA ｜ 第一个开源的大号 VLA</h3>
+  <p class="meta">2024 ｜ 斯坦福 / UC 伯克利 ｜ 7B 参数 ｜ <a href="https://arxiv.org/abs/2406.09246" target="_blank" rel="noopener">arXiv 2406.09246</a></p>
+
+  <p class="why"><strong>一句话：</strong>用 Llama 2 当语言底座，加上视觉编码器，训练出一个 70 亿参数的开源 VLA，权重和代码全放出来了。</p>
+  <p class="why"><strong>解决什么：</strong>证明了<strong>"开源 + 小模型"也能打</strong>：7B 的它比 55B 的闭源 RT-2-X 成功率还高 16.5%。</p>
+  <p class="why"><strong>和你什么有关：</strong>这是你做 VLA 小项目时<strong>最可能真正下载下来微调</strong>的那类模型——消费级显卡用 LoRA 就能微调。你的 3060 6GB 会很吃力，但思路要先懂。</p>
+  <p class="why"><strong>什么时候读：</strong><strong>2027 年</strong>做具身智能小项目时。现在只需要记住名字。</p>
+</div>
+
+<div class="hot">
+  <h3>3. π0 ｜ 双臂机器人的主流做法</h3>
+  <p class="meta">2024 ｜ Physical Intelligence ｜ <a href="https://arxiv.org/abs/2410.24164" target="_blank" rel="noopener">arXiv 2410.24164</a> ｜ 代码 <a href="https://github.com/Physical-Intelligence/openpi" target="_blank" rel="noopener">openpi</a></p>
+
+  <p class="why"><strong>一句话：</strong>视觉语言模型 + 一个专门出动作的"动作专家"，用 flow matching 生成高频连续动作，最高 50Hz。</p>
+  <p class="why"><strong>解决什么：</strong>VLA 之前有个大问题：想得清楚但动得慢。π0 把"动作频率"提上去了，能叠衣服、整理桌子这类连续任务。</p>
+  <p class="why"><strong>和你什么有关：</strong>它的实验里<strong>有双臂平台</strong>（ALOHA 型）。你的课题是双机械臂，双臂协调那部分的思路可以直接借鉴：两只手不是各干各的，是一起出一个联合动作。</p>
+  <p class="why"><strong>什么时候读：</strong><strong>2027 年</strong>。到那时先看它的图 1 和任务视频，别碰公式。</p>
+</div>
+
+<div class="hot">
+  <h3>4. 小米 Robotics-0 ｜ 国内开源 VLA</h3>
+  <p class="meta">2026-02 开源 ｜ 约 47 亿参数 ｜ Apache-2.0 ｜ <a href="https://arxiv.org/abs/2602.12684" target="_blank" rel="noopener">arXiv 2602.12684</a></p>
+
+  <p class="why"><strong>一句话：</strong>视觉语言大脑 + 扩散动作专家，代码和权重都开源。</p>
+  <p class="why"><strong>为什么值得知道：</strong>国内团队做的、中文文档更友好、权重能直接下载。以后你要跑通第一个 VLA，<strong>从国内的开始比自己啃英文仓库快得多</strong>。</p>
+  <p class="why"><strong>什么时候读：</strong>2027 年做小项目时，作为<strong>第一优先级</strong>去看它的示例代码。</p>
+</div>
+
+<div class="hot">
+  <h3>5. Psi0 ｜ 人形机器人的全身移动 + 操作</h3>
+  <p class="meta">2026-11 ｜ RSS'26 收录 ｜ <a href="https://arxiv.org/abs/2603.12263" target="_blank" rel="noopener">arXiv 2603.12263</a></p>
+
+  <p class="why"><strong>一句话：</strong>人形机器人的开源基础模型，目标是"边走边操作"这类全身任务。</p>
+  <p class="why"><strong>和你什么有关：</strong>人形双臂和你课题里的<strong>双机械臂</strong>在"两手怎么配合"这一层是相通的。以后查资料，<code>loco-manipulation</code>、<code>dual-arm</code>、<code>bimanual</code> 这几个词会反复出现。</p>
+  <p class="why"><strong>什么时候读：</strong>更晚。等你的双臂课题有了具体问题再看，现在看只会剩下"好厉害"。</p>
+</div>
+
+<div class="hot">
+  <h3>6. FlowPilot ｜ 大模型直接开无人机</h3>
+  <p class="meta">2026-11 ｜ 北京理工大学等 ｜ <a href="https://arxiv.org/abs/2608.00635" target="_blank" rel="noopener">arXiv 2608.00635</a></p>
+
+  <p class="why"><strong>一句话：</strong>用"世界-动作模型"做敏捷无人机导航，不再拆成感知→规划→控制三段，而是模型直接给飞行动作。</p>
+  <p class="why"><strong>解决什么：</strong>传统三段式每一环都可能丢信息、都增加延迟。这一类工作想让"看到画面"和"做出机动"之间的链路更短。</p>
+  <p class="why"><strong>和你什么有关：</strong>这是<strong>你的方向（无人机集群 + VLA）正中间那块地</strong>。等你到集群阶段，这类论文就是你的主要参考。</p>
+  <p class="why"><strong>什么时候读：</strong>现在只看摘要和图 1，<strong>5 分钟</strong>，建立"这个圈子里有人在这么干"的印象就够了。</p>
+</div>
+
+<h2>读的顺序（跟着主线走）</h2>
+<table>
+  <tr><th>时间</th><th>读什么</th><th>读多深</th></tr>
+  <tr><td>现在 ~ 12 月</td><td>都不读</td><td>把 6 周基础和电脑实操做完</td></tr>
+  <tr><td>2027 春</td><td>Diffusion Policy</td><td>看懂图 1 + 动作块是什么</td></tr>
+  <tr><td>2027 春</td><td>OpenVLA / 小米 VLA</td><td>能说出"输入是什么、输出是什么"</td></tr>
+  <tr><td>2027 夏</td><td>π0</td><td>对照你的双臂课题，找可借鉴的部分</td></tr>
+  <tr><td>2027 秋之后</td><td>FlowPilot 等集群 + VLA 论文</td><td>这是你要往下做的地方</td></tr>
+</table>
+
+<p class="foot">读不懂不是能力问题，是还没到那个时间点</p>
+
+<script src="nav.js"></script>
+</body>
+</html>

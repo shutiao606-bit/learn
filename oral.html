@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.json">
+<title>每日一述</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html">← 主页</a>
+  <span class="where">每日一述</span>
+</header>
+
+<h1>每日一述</h1>
+<p class="sub">60 秒，用嘴说清一道题</p>
+
+<div class="card">
+  <p><strong>写在纸上会了，不一定会说。</strong>以后组会汇报、面试、给导师讲，考的都是"张嘴就能讲明白"。手机最适合练这个，不用电脑。</p>
+  <p class="hint">规则：点开始，然后<strong>出声说 60 秒，中途不许看答案</strong>。</p>
+</div>
+
+<div class="card oral-q">
+  <p class="meta" id="meta"></p>
+  <h3 id="question">点下面「抽一道」开始</h3>
+</div>
+
+<div class="btn-row">
+  <button type="button" id="start">开始 60 秒</button>
+  <button type="button" id="draw" class="secondary">抽一道</button>
+</div>
+
+<div class="card" id="timer-card" style="display:none">
+  <p class="oral-clock" id="clock">60</p>
+  <div class="oral-bar"><div class="oral-fill" id="fill"></div></div>
+  <div class="btn-row">
+    <button type="button" id="stop" class="secondary">提前结束</button>
+  </div>
+</div>
+
+<div class="card" id="rate-card" style="display:none">
+  <p><strong>刚才说得怎么样？</strong></p>
+  <div class="btn-row">
+    <button type="button" class="rate" data-r="顺">一口气说下来了</button>
+    <button type="button" class="rate secondary" data-r="卡">中间卡住了</button>
+    <button type="button" class="rate secondary" data-r="不会">根本说不出来</button>
+  </div>
+</div>
+
+<h2>最近几次</h2>
+<div class="card">
+  <ul id="history" class="oral-hist"><li class="hint">还没有记录。</li></ul>
+</div>
+
+<p class="foot">说不清，就是还没懂</p>
+
+<script src="questions.js"></script>
+<script src="nav.js"></script>
+<script>
+(function () {
+  var BANK = window.BANK || [];
+  var KEY = 'oral_log_v1';
+  var qEl = document.getElementById('question');
+  var metaEl = document.getElementById('meta');
+  var clockEl = document.getElementById('clock');
+  var fillEl = document.getElementById('fill');
+  var timerCard = document.getElementById('timer-card');
+  var rateCard = document.getElementById('rate-card');
+  var current = null;
+  var timer = null;
+  var left = 60;
+
+  function pick() {
+    var pool = BANK.filter(function (b) { return b.key.indexOf('w1z_') !== 0; });
+    if (!pool.length) pool = BANK;
+    if (!pool.length) { qEl.textContent = '题库还没加载'; return; }
+    // 优先抽没练过的
+    var done = readLog().map(function (x) { return x.key; });
+    var fresh = pool.filter(function (b) { return done.indexOf(b.key) < 0; });
+    var src = fresh.length ? fresh : pool;
+    current = src[Math.floor(Math.random() * src.length)];
+    qEl.textContent = current.q;
+    metaEl.textContent = current.num + ' ' + current.card;
+    metaEl.style.display = '';
+    timerCard.style.display = 'none';
+    rateCard.style.display = 'none';
+    clearInterval(timer);
+    left = 60;
+    document.getElementById('start').textContent = '开始 60 秒';
+  }
+
+  function tick() {
+    left--;
+    clockEl.textContent = left;
+    fillEl.style.width = ((60 - left) / 60 * 100) + '%';
+    if (left <= 0) {
+      clearInterval(timer);
+      stopAndRate();
+    }
+  }
+
+  function stopAndRate() {
+    clearInterval(timer);
+    rateCard.style.display = '';
+    document.getElementById('start').textContent = '重说一遍';
+  }
+
+  function readLog() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+  }
+
+  function renderHistory() {
+    var log = readLog().slice(-5).reverse();
+    var ul = document.getElementById('history');
+    if (!log.length) { ul.innerHTML = '<li class="hint">还没有记录。</li>'; return; }
+    ul.innerHTML = log.map(function (x) {
+      var mark = x.r === '顺' ? '✅' : (x.r === '卡' ? '⚠️' : '❌');
+      return '<li>' + mark + ' ' + x.num + ' ' + esc(x.card) +
+             '<span class="hint"> ｜ ' + x.t + '</span></li>';
+    }).join('');
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  function save(r) {
+    if (!current) return;
+    var log = readLog();
+    var d = new Date();
+    log.push({
+      key: current.key, num: current.num, card: current.card, r: r,
+      t: (d.getMonth() + 1) + '/' + d.getDate()
+    });
+    if (log.length > 50) log = log.slice(-50);
+    localStorage.setItem(KEY, JSON.stringify(log));
+    renderHistory();
+    rateCard.style.display = 'none';
+  }
+
+  document.getElementById('draw').addEventListener('click', pick);
+
+  document.getElementById('start').addEventListener('click', function () {
+    if (!current) pick();
+    timerCard.style.display = '';
+    rateCard.style.display = 'none';
+    clockEl.textContent = 60;
+    fillEl.style.width = '0%';
+    left = 60;
+    clearInterval(timer);
+    timer = setInterval(tick, 1000);
+  });
+
+  document.getElementById('stop').addEventListener('click', stopAndRate);
+
+  Array.prototype.forEach.call(document.querySelectorAll('.rate'), function (b) {
+    b.addEventListener('click', function () { save(b.getAttribute('data-r')); });
+  });
+
+  renderHistory();
+  pick();
+})();
+</script>
+</body>
+</html>
