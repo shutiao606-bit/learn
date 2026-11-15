@@ -801,3 +801,51 @@ button.secondary {
   word-break: break-all;
   overflow-x: auto;
 }
+
+/* ---------- 旧题回访：新旧答案对照 ---------- */
+.cmp {
+  display: grid;
+  gap: var(--s3);
+  margin: var(--s3) 0;
+}
+@media (min-width: 640px) {
+  .cmp { grid-template-columns: 1fr 1fr; }
+}
+.cmp-col { min-width: 0; }
+.cmp-tag {
+  display: inline-block;
+  margin-bottom: var(--s1);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--line);
+  color: var(--muted);
+}
+.cmp-tag.now { background: var(--accent); color: #fff; }
+.cmp-old {
+  margin: 0;
+  padding: var(--s3);
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  white-space: pre-wrap;
+  font-size: .95em;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.rv-new {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 96px;
+}
+.rv-link {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--fg);
+  text-decoration: none;
+  font-size: .95em;
+}
+.rv-q { font-size: 1.02em; line-height: 1.6; margin: var(--s2) 0; }

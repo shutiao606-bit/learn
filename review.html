@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>旧题回访</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html">← 主页</a>
+  <span class="where">旧题回访</span>
+</header>
+
+<h1>旧题回访</h1>
+<p class="sub">同一道题，隔几周再答一遍</p>
+
+<div class="card">
+  <p>答过的题不会自己留在脑子里。<strong>这里每次随机抽 3 道你答过的题</strong>，让你用现在的水平重答一次，然后和当时的答案并排放着看。</p>
+  <p class="hint">答案从你手机本地读，不会上传。</p>
+</div>
+
+<div class="btn-row">
+  <button type="button" id="draw">换一批</button>
+</div>
+
+<div id="list"></div>
+
+<p class="foot">看见差别，才叫进步</p>
+
+<script src="questions.js"></script>
+<script src="nav.js"></script>
+<script>
+(function () {
+  var BANK = window.BANK || [];
+  var list = document.getElementById('list');
+
+  function answered() {
+    return BANK.filter(function (b) {
+      var v = localStorage.getItem(b.key);
+      return v && v.trim().length > 2;
+    });
+  }
+
+  function cardTime(b) {
+    try {
+      var t = localStorage.getItem('sb_last_' + b.title);
+      if (!t) return '';
+      var d = new Date(t);
+      return (d.getMonth() + 1) + '/' + d.getDate();
+    } catch (e) { return ''; }
+  }
+
+  function buildItem(b) {
+    var old = (localStorage.getItem(b.key) || '').trim();
+    var now = localStorage.getItem('rv_' + b.key) || '';
+    var when = cardTime(b);
+
+    var wrap = document.createElement('div');
+    wrap.className = 'hot';
+    wrap.innerHTML =
+      '<p class="meta">' + b.num + ' ' + b.card + (when ? ' ｜ 原答于 ' + when : '') + '</p>' +
+      '<h3 class="rv-q"></h3>' +
+      '<div class="cmp">' +
+        '<div class="cmp-col"><span class="cmp-tag">当时</span><p class="cmp-old"></p></div>' +
+        '<div class="cmp-col"><span class="cmp-tag now">现在</span><textarea class="rv-new" placeholder="先别看上面，凭现在的理解重答一遍"></textarea></div>' +
+      '</div>' +
+      '<div class="btn-row">' +
+        '<a class="rv-link" href="' + b.file + '">回原卡看讲解</a>' +
+        '<button type="button" class="rv-save">保存这次的答案</button>' +
+      '</div>';
+
+    wrap.querySelector('.rv-q').textContent = b.q;
+    wrap.querySelector('.cmp-old').textContent = old || '（当时没写）';
+
+    var ta = wrap.querySelector('.rv-new');
+    ta.value = now;
+    ta.addEventListener('input', function () {
+      localStorage.setItem('rv_' + b.key, ta.value);
+    });
+
+    wrap.querySelector('.rv-save').addEventListener('click', function () {
+      var btn = this;
+      localStorage.setItem('rv_' + b.key, ta.value);
+      btn.textContent = '已保存 ✓';
+      setTimeout(function () { btn.textContent = '保存这次的答案'; }, 2000);
+    });
+
+    return wrap;
+  }
+
+  function draw() {
+    var pool = answered();
+    list.innerHTML = '';
+
+    if (!pool.length) {
+      list.innerHTML = '<div class="card"><p>还没有答过的题。先去<a href="index.html">读一张卡</a>，答完再回来。</p></div>';
+      return;
+    }
+
+    // 优先抽"没回访过的"，不够再补
+    var fresh = pool.filter(function (b) { return !localStorage.getItem('rv_done_' + b.key); });
+    var pick = (fresh.length ? fresh : pool).slice();
+    for (var i = pick.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = pick[i]; pick[i] = pick[j]; pick[j] = t;
+    }
+    pick = pick.slice(0, 3);
+
+    pick.forEach(function (b) {
+      localStorage.setItem('rv_done_' + b.key, new Date().toISOString());
+      list.appendChild(buildItem(b));
+    });
+
+    var tip = document.createElement('p');
+    tip.className = 'hint';
+    tip.textContent = '共 ' + pool.length + ' 道答过的题，这次抽了 ' + pick.length + ' 道。';
+    list.appendChild(tip);
+  }
+
+  document.getElementById('draw').addEventListener('click', draw);
+  draw();
+})();
+</script>
+</body>
+</html>

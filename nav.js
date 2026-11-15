@@ -22,6 +22,13 @@
 
   var cur = here();
 
+  // ---- 离线缓存（PWA）：只在 https/localhost 下注册 ----
+  try {
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    }
+  } catch (e) { /* 忽略 */ }
+
   // ---- 本机待发队列：能联网就悄悄补发，首页显示还剩几条 ----
   function pendingNode() {
     if (cur !== 'index.html' && cur !== '') return null;

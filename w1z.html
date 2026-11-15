@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>第 1 周 · 复盘与综合测验</title>
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -105,6 +106,27 @@
   <textarea id="q9" placeholder="Windows 敲...，Linux 敲...&#10;0 代表...，1 代表..."></textarea>
 </div>
 
+<h2>四、这周我能用它干什么（必写）</h2>
+<div class="card">
+  <p>这一栏不是考你，是考<strong>能不能用</strong>。用三句话说清：这周学的这些，在无人机 / VLA 那条路上，具体能干什么。</p>
+  <p class="hint">写不出来 = 只是看懂了，还没到"能用"。宁可写一句真的，也别写三句空话。</p>
+</div>
+
+<div class="answer-box">
+  <label>句一：这周学的东西里，我觉得以后最常用的是……，因为……</label>
+  <textarea id="q10" placeholder="最常用的是……，因为以后跑仿真的时候……"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>句二：如果现在给我一个 PX4 / Gazebo 的场景，我能用这周的哪一招先做什么？</label>
+  <textarea id="q11" placeholder="我能先用……（具体一条命令或一个判断）"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>句三：这周我还没搞明白、下周想弄清的一个问题是……</label>
+  <textarea id="q12" placeholder="我还没搞明白……"></textarea>
+</div>
+
 <div class="btn-row">
   <button onclick="gen()">生成答题卡</button>
   <button class="secondary" onclick="copyOut()">复制</button>
@@ -135,7 +157,7 @@
 <p class="foot">答完提交，才算这周过关。没提交 = 没答。</p>
 
 <script>
-const ids = ['q1','q2','q3','q4','q5','q6','q7','q8','q9'];
+const ids = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12'];
 const labels = {
   q1: 'Q1 两个路径判断',
   q2: 'Q2 报错断在哪一步',
@@ -145,7 +167,10 @@ const labels = {
   q6: 'Q6 口述：一条命令怎么跑',
   q7: '变式题 只留一个词',
   q8: 'Q7 端口被占用（三个词）',
-  q9: 'Q8 退出码'
+  q9: 'Q8 退出码',
+  q10: '这周最常用的一点',
+  q11: 'PX4/Gazebo 场景能先做什么',
+  q12: '还没弄明白的一个问题'
 };
 
 ids.forEach(id => {
