@@ -142,3 +142,158 @@
     }
   } catch (e) { /* 老浏览器忽略 */ }
 })();
+
+// ============================================================
+// 悬浮球：随时记点子 / 提问
+// 批改提醒：打开页面时拉一次未读批改，有就提示
+// ============================================================
+(function () {
+  var Net = window.Net;
+
+  // ---------- 悬浮球 ----------
+  function buildFab() {
+    if (document.getElementById('fab')) return;
+    var fab = document.createElement('button');
+    fab.id = 'fab';
+    fab.type = 'button';
+    fab.setAttribute('aria-label', '随手记');
+    fab.textContent = '+';
+    document.body.appendChild(fab);
+
+    var sheet = document.createElement('div');
+    sheet.id = 'fab-sheet';
+    sheet.className = 'fab-sheet';
+    sheet.innerHTML =
+      '<div class="fab-head"><strong>随手记</strong><span id="fab-close">关闭</span></div>' +
+      '<div class="fab-tabs">' +
+        '<button type="button" class="fab-tab on" data-k="💡点子">点子</button>' +
+        '<button type="button" class="fab-tab" data-k="❓提问">疑问</button>' +
+      '</div>' +
+      '<textarea id="fab-text" placeholder="一句话就行，别组织语言"></textarea>' +
+      '<div class="btn-row">' +
+        '<button type="button" id="fab-send">发出去</button>' +
+        '<button type="button" class="secondary" id="fab-keep">先存着</button>' +
+      '</div>' +
+      '<p class="hint" id="fab-msg"></p>';
+    document.body.appendChild(sheet);
+
+    var kind = '💡点子';
+    var ta = sheet.querySelector('#fab-text');
+
+    try {
+      ta.value = localStorage.getItem('fab_draft') || '';
+    } catch (e) {}
+    ta.addEventListener('input', function () {
+      try { localStorage.setItem('fab_draft', ta.value); } catch (e) {}
+    });
+
+    Array.prototype.forEach.call(sheet.querySelectorAll('.fab-tab'), function (b) {
+      b.addEventListener('click', function () {
+        Array.prototype.forEach.call(sheet.querySelectorAll('.fab-tab'), function (x) {
+          x.classList.remove('on');
+        });
+        b.classList.add('on');
+        kind = b.getAttribute('data-k');
+      });
+    });
+
+    function msg(t, ok) {
+      var m = sheet.querySelector('#fab-msg');
+      m.textContent = t;
+      m.style.color = ok ? '#2f9e44' : '#c92a2a';
+    }
+
+    function send() {
+      var text = (ta.value || '').trim();
+      if (text.length < 2) { msg('写两个字再发。', false); return; }
+      if (!Net || !Net.configured()) { msg('云端还没配置，先存着。', false); return; }
+
+      var payload = {
+        card: kind,
+        week: (window.SB && window.SB.week) || '',
+        body: text,
+        ua: navigator.userAgent.slice(0, 200)
+      };
+      var id = Net.outbox.push(payload, '');
+      msg('发送中…', true);
+      Net.send({ body: JSON.stringify(payload) }, 3).then(function (r) {
+        if (Net.isOk(r.status)) {
+          Net.outbox.remove(id);
+          ta.value = '';
+          try { localStorage.removeItem('fab_draft'); } catch (e) {}
+          msg('已记下 ✓', true);
+          setTimeout(close, 900);
+        } else {
+          msg('服务器回了 ' + r.status + '，已存本机', false);
+        }
+      }).catch(function () {
+        msg('没连上，已存本机，下次自动补发', false);
+      });
+    }
+
+    function open() { sheet.classList.add('on'); }
+    function close() { sheet.classList.remove('on'); }
+
+    fab.addEventListener('click', open);
+    sheet.querySelector('#fab-close').addEventListener('click', close);
+    sheet.querySelector('#fab-send').addEventListener('click', send);
+    sheet.querySelector('#fab-keep').addEventListener('click', function () {
+      try { localStorage.setItem('fab_draft', ta.value); } catch (e) {}
+      msg('已存在本机，下次打开还在', true);
+    });
+  }
+
+  // ---------- 批改提醒 ----------
+  function buildNotice(rows) {
+    if (document.getElementById('notice')) return;
+    var bar = document.createElement('div');
+    bar.id = 'notice';
+    bar.className = 'notice';
+    bar.innerHTML =
+      '<span class="notice-txt">有 <strong>' + rows.length + '</strong> 条批改还没看</span>' +
+      '<button type="button" id="notice-open">看看</button>' +
+      '<button type="button" id="notice-x" aria-label="关掉">×</button>';
+
+    var sheet = document.createElement('div');
+    sheet.className = 'fab-sheet notice-sheet';
+    sheet.id = 'notice-sheet';
+    var html = '<div class="fab-head"><strong>批改结果</strong><span id="notice-close">关闭</span></div>';
+    rows.forEach(function (r) {
+      var cls = r.verdict === 'ok' ? 'ok' : (r.verdict === 'fix' ? 'fix' : 'wait');
+      var tag = r.verdict === 'ok' ? '说对了' : (r.verdict === 'fix' ? '要改' : '待批');
+      html += '<div class="fb ' + cls + '">' +
+              '<p class="fb-head"><span class="fb-tag">' + tag + '</span>' +
+              (r.card ? '<span class="hint">' + String(r.card).slice(0, 40) + '</span>' : '') + '</p>' +
+              '<p class="fb-note"></p></div>';
+    });
+    sheet.innerHTML = html;
+    // 内容用 textContent 填，避免后端文本被当成 HTML
+    var notes = sheet.querySelectorAll('.fb-note');
+    rows.forEach(function (r, i) {
+      if (notes[i]) notes[i].textContent = r.note || '';
+    });
+    document.body.appendChild(sheet);
+
+    bar.querySelector('#notice-open').addEventListener('click', function () {
+      sheet.classList.add('on');
+      Net.markSeen(rows.map(function (r) { return r.id; }));
+    });
+    bar.querySelector('#notice-x').addEventListener('click', function () {
+      bar.remove();
+      Net.markSeen(rows.map(function (r) { return r.id; }));
+    });
+    sheet.querySelector('#notice-close').addEventListener('click', function () {
+      sheet.classList.remove('on');
+    });
+
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    buildFab();
+    if (!Net || !Net.configured()) return;
+    Net.poll().then(function (rows) {
+      if (rows && rows.length) buildNotice(rows.slice(0, 20));
+    }).catch(function () {});
+  });
+})();

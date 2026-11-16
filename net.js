@@ -244,12 +244,56 @@
     return next();
   }
 
+  // 读批改结果：GET 后端，返回未读的批改
+  function poll() {
+    if (!configured()) return Promise.resolve([]);
+    var u = url();
+    function viaFetchGet() {
+      var ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
+      return fetch(u, { method: 'GET', cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
+        .then(function (r) {
+          if (timer) clearTimeout(timer);
+          if (!r.ok) return [];
+          return r.json().catch(function () { return []; });
+        }, function (e) {
+          if (timer) clearTimeout(timer);
+          throw e;
+        });
+    }
+    function viaXHRGet() {
+      return new Promise(function (resolve, reject) {
+        var x = new XMLHttpRequest();
+        x.open('GET', u, true);
+        x.timeout = 7000;
+        x.onload = function () {
+          try { resolve(JSON.parse(x.responseText || '[]')); }
+          catch (e) { resolve([]); }
+        };
+        x.onerror = function () { reject(new Error('xhr')); };
+        x.ontimeout = function () { reject(new Error('timeout')); };
+        x.send(null);
+      });
+    }
+    return viaFetchGet().catch(viaXHRGet).then(function (d) {
+      return Array.isArray(d) ? d : (d && Array.isArray(d.items) ? d.items : []);
+    }).catch(function () { return []; });
+  }
+
+  // 标记已读
+  function markSeen(ids) {
+    if (!ids || !ids.length) return Promise.resolve();
+    return send({ body: JSON.stringify({ action: 'seen', ids: ids }) }, 2).catch(function () {});
+  }
+
   window.Net = {
     configured: configured,
     url: url,
     warm: warm,
     isOk: isOk,
     send: send,
+    poll: poll,
+    markSeen: markSeen,
     resetTrace: resetTrace,
     traceText: traceText,
     outbox: { push: push, remove: remove, count: count, flush: flush, read: readBox },
