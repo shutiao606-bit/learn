@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>第 1 周补充 · 一条命令怎么跑</title>
+<title>第 1 周 · ②A 一条命令怎么跑起来</title>
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -11,179 +11,135 @@
 
 <header class="topbar">
   <a href="index.html">← 主页</a>
-  <span class="where">第 1 周 · ② 一条命令怎么跑</span>
+  <span class="where">第 1 周 · ②A</span>
 </header>
 
-<h1>第 1 周补充 · 一条命令怎么跑</h1>
-<p class="sub">把「路径 / 目录」和「进程」连起来的那根线 ｜ 11/17 · 第 2 张</p>
+<h1>②A 一条命令怎么跑起来</h1>
+<p class="sub">只有三个角色 ｜ 11/17 · 第 2 张</p>
 
-<h2>一、为什么非要懂这个</h2>
 <div class="card">
-  <p>你在终端敲 <code>ls</code>，屏幕就吐出一屏文件名。看起来是一瞬间的事，其实中间发生了四件事。</p>
-  <p>不懂这四件事，以后你装 PX4、跑 ROS2，屏幕上蹦出下面这些字，你只能干瞪眼：</p>
-  <ul>
-    <li><code>command not found</code> —— 命令找不到</li>
-    <li><code>No such file or directory</code> —— 文件找不到</li>
-    <li><code>Permission denied</code> —— 不让你干</li>
-  </ul>
-  <p>这三句话，是四步里<strong>不同步骤</strong>断掉时说的话。知道断在哪一步，才知道该改什么。</p>
+  <p><strong>这张卡只讲一件事：</strong>你敲下回车到屏幕出结果，中间是谁在干活。</p>
+  <p>不讲 PATH，不讲参数，不讲退出码——那些留给 ②B。<strong>一次只想通一件事。</strong></p>
+</div>
+
+<h2>一、为什么必须先懂这个</h2>
+<div class="card">
+  <p>因为你迟早会撞上这三句话，而它们对应的是<strong>完全不同的三个原因</strong>：</p>
+  <table>
+    <tr><th>屏幕上的字</th><th>真正的原因</th></tr>
+    <tr><td><code>command not found</code></td><td>系统里<strong>没有这个程序</strong>，或者它不在搜索清单里</td></tr>
+    <tr><td><code>No such file or directory</code></td><td>程序<strong>找到了</strong>，但它要打开的那个文件不存在</td></tr>
+    <tr><td><code>Permission denied</code></td><td>程序和文件都在，但你<strong>没有权限</strong>动它</td></tr>
+  </table>
+  <p>不懂这三个角色，你看到第一句只会想"是不是没装"。懂了，你第一反应是<strong>"它连程序都没找到，跟文件没关系"</strong>。</p>
 </div>
 
 <h2>二、三个角色</h2>
+
 <div class="card">
-  <table>
-    <tr><th>角色</th><th>是谁</th><th>只干一件事</th></tr>
-    <tr><td><strong>终端</strong><br>Terminal</td><td>你敲字的那个黑窗口</td><td>收你敲的字、把结果打出来。<strong>它自己不懂命令</strong></td></tr>
-    <tr><td><strong>Shell</strong><br>命令解释器</td><td>Windows：<code>cmd</code> / <code>PowerShell</code><br>Linux：<code>bash</code></td><td>看懂你写的那行字，负责<strong>找到</strong>该跑的程序</td></tr>
-    <tr><td><strong>进程</strong><br>Process</td><td>真的在跑的那个程序</td><td>干活。干完就消失</td></tr>
-  </table>
-</div>
-<div class="analogy">
-  终端 = <strong>传话窗口</strong>；Shell = <strong>管家</strong>；进程 = <strong>工人</strong>。<br>
-  你递一张纸条给管家，写「拿锤子 钉子」。管家负责去工具箱找到锤子，再叫一个工人去砸。工人干完活走人，钉子盒还在原地。
+  <p><strong>1. 终端（Terminal）—— 那个黑窗口</strong></p>
+  <p>它的工作只有两件：<strong>收下你敲的字</strong>、<strong>把结果打出来</strong>。</p>
+  <p class="hint">它自己<strong>一个字都不懂</strong>。就像餐厅门口的取号机，它只负责把你的单子递进去。</p>
 </div>
 
-<h2>三、四步</h2>
+<div class="card">
+  <p><strong>2. Shell —— 看懂你写的那行字的人</strong></p>
+  <p>Windows 上叫 <code>cmd</code> 或 <code>PowerShell</code>，Linux 上通常叫 <code>bash</code>。它做的事：</p>
+  <ul>
+    <li>把这一行<strong>拆成几个词</strong></li>
+    <li>拿第一个词去<strong>找对应的程序</strong></li>
+    <li>找到就<strong>把它启动起来</strong></li>
+  </ul>
+  <p class="hint">它是<strong>服务生</strong>：听得懂你说什么，负责去后厨把人叫出来，但炒菜的活它不干。</p>
+</div>
+
+<div class="card">
+  <p><strong>3. 程序 / 进程 —— 真正干活的</strong></p>
+  <p>shell 找到的那个东西。它开始运行，就是 ③ 卡里说的<strong>进程</strong>。干完活就消失。</p>
+  <p class="hint">它是<strong>厨师</strong>：只看订单做菜，做完了这单就结束。</p>
+</div>
+
+<div class="analogy">
+  <strong>完整画面：</strong><br>
+  取号机（终端）收下你写的单子 → 服务生（shell）看单子、去后厨叫厨师 → 厨师（程序）炒菜、装盘 → 菜端回你桌上（屏幕）。<br><br>
+  <strong>关键：</strong>如果单子上写的菜后厨没有，服务生当场就会告诉你"没有这道菜"（<code>command not found</code>），<strong>根本不会有厨师动手</strong>。
+</div>
+
+<h2>三、四步，一步不错</h2>
 <div class="card">
   <ol>
-    <li><strong>你按回车</strong> → 终端把这一整行字交给 shell。</li>
-    <li><strong>shell 拆词</strong> → 把第一个词当「程序名」，去 <code>PATH</code> 里列的目录中<strong>挨个找</strong>；找到就停，不再往下找。</li>
-    <li><strong>系统建进程</strong> → 找到后，操作系统新开一个进程，把后面的词当「参数」交给它。</li>
-    <li><strong>干活并回话</strong> → 进程运行，把结果写到屏幕；结束时进程消失。</li>
+    <li><strong>回车</strong> —— 终端把这一整行字交给 shell</li>
+    <li><strong>shell 拆词并找程序</strong> —— 第一个词当作"程序名"，去找它（<em>去哪找，是 ②B 的内容</em>）</li>
+    <li><strong>启动</strong> —— 找到了，就开一个新进程，把后面那些词一起交给它</li>
+    <li><strong>运行并回话</strong> —— 进程干活，结果写到屏幕，进程结束</li>
   </ol>
-  <p><strong>PATH 是什么？</strong>一张「程序搜索目录清单」。shell 只在这几个目录里找可执行文件。不在清单里的程序，就得写全路径才叫得动它。</p>
+  <p><strong>记住第 2 步：</strong>只有第 2 步会失败得这么早。它一失败，第 3、4 步压根不会发生。</p>
 </div>
 
-<h2>四、最关键的一条区分</h2>
+<h2>四、报错断在哪——这是这张卡的全部意义</h2>
 <div class="card">
-  <p><strong>命令 = 程序名 + 参数。</strong>这两半是按<strong>完全不同的规矩</strong>找的：</p>
   <table>
-    <tr><th></th><th>怎么找</th><th>例子</th></tr>
-    <tr><td><strong>第一个词</strong>（程序名）</td><td>靠 <code>PATH</code> 清单找</td><td><code>ls</code>、<code>python</code></td></tr>
-    <tr><td><strong>后面的词</strong>（参数）</td><td>靠<strong>当前目录</strong>或你写的路径找</td><td><code>进度.md</code>、<code>D:\code\a.py</code></td></tr>
+    <tr><th>报错</th><th>断在第几步</th><th>说明什么</th></tr>
+    <tr><td><code>command not found</code></td><td><strong>第 2 步</strong></td><td>shell 没找到这个程序，厨师没上岗</td></tr>
+    <tr><td><code>No such file or directory</code></td><td><strong>第 4 步</strong></td><td>厨师上岗了，但它要开的文件不在</td></tr>
+    <tr><td><code>Permission denied</code></td><td><strong>第 4 步</strong></td><td>厨师上岗了，文件也在，但不让动</td></tr>
   </table>
-  <p>这就解释了两件你迟早会撞上的事：</p>
-  <ul>
-    <li><code>ls</code> 在<strong>哪个目录下敲都能用</strong>——因为它在 PATH 里，跟你在哪无关。</li>
-    <li><code>python 进度.md</code> 却要求 <code>进度.md</code> <strong>相对当前目录写对</strong>——因为它是参数，靠当前目录算。</li>
-  </ul>
+  <p><strong>所以判断方法很简单：</strong>报错里出现的是<strong>"命令"</strong>这个词 → 第 2 步；出现的是<strong>文件路径</strong> → 第 4 步。</p>
 </div>
+
 <div class="analogy">
-  <strong>一句话：</strong>程序名靠「通讯录」找，参数靠「你现在站哪儿」找。<br>
-  这就是上一张卡片里「当前目录」为什么那么重要的真正原因。
+  <strong>一句话记住：</strong>报错说的是"命令"，找的是<strong>服务生</strong>的麻烦；报错说的是"文件"，找的是<strong>厨师</strong>的麻烦。
 </div>
 
-<h2>五、怎么做：验证一个程序在哪</h2>
-<div class="card">
-  <p>想确认 shell 是从哪找到某个程序的，直接问它：</p>
-  <table>
-    <tr><th>系统</th><th>查程序位置</th><th>看 PATH 清单</th></tr>
-    <tr><td>Windows</td><td><code>where python</code></td><td><code>echo %PATH%</code></td></tr>
-    <tr><td>Linux</td><td><code>which python3</code></td><td><code>echo $PATH</code></td></tr>
-  </table>
-  <p>打印出来的那一串目录，就是 shell 找程序时会去翻的抽屉。</p>
-</div>
-
-<h2>六、命令跑完了，成没成？——退出码</h2>
-<div class="card">
-  <p>很多命令跑完屏幕上一个字都不出。那你凭什么知道它成功了？</p>
-  <p>凭<strong>退出码</strong>：每个进程结束时会交给 shell 一个数字。</p>
-  <ul>
-    <li><code>0</code> —— <strong>成功</strong></li>
-    <li><strong>非 0</strong> —— 失败。不同的数字代表不同的失败原因，具体含义看程序的说明书</li>
-  </ul>
-  <p>注意反直觉的地方：<strong>屏幕上没报错，不等于成功</strong>。有些程序失败了也一声不吭，只在退出码里留个 1。</p>
-</div>
-<div class="analogy">
-  快递员送完货会回去交差：<strong>「送到了」</strong>（0）或者 <strong>「家里没人」</strong>（非 0）。<br>
-  你不问，他也走了——屏幕上什么都不显示，但结果已经定了。
-</div>
-<div class="card">
-  <p><strong>怎么看：</strong>紧接着上一条命令敲下面这句，问的就是"刚才那声命令，你交了哪个数"。</p>
-  <table>
-    <tr><th>系统</th><th>命令</th></tr>
-    <tr><td>Linux / WSL</td><td><code>echo $?</code></td></tr>
-    <tr><td>Windows PowerShell</td><td><code>echo $LASTEXITCODE</code></td></tr>
-    <tr><td>Windows cmd</td><td><code>echo %errorlevel%</code></td></tr>
-  </table>
-  <p>还有一个日常用法：<code>命令A &amp;&amp; 命令B</code> —— 只有 A 返回 0，B 才会执行。以后写自动化脚本全靠这个。</p>
-</div>
-
-<h2>七、以后在无人机里怎么用</h2>
+<h2>五、以后在无人机里怎么用</h2>
 <div class="card">
   <table>
-    <tr><th>以后你会碰到的</th><th>这一周对应的概念</th></tr>
-    <tr><td><code>ros2 launch px4 ...</code> 一条命令拉起十几个节点</td><td>shell 拆词、PATH 找程序</td></tr>
-    <tr><td><code>ros2: command not found</code> —— 十有八九是没 <code>source</code> 环境</td><td>PATH 清单里没有它</td></tr>
-    <tr><td>脚本里 <code>cd ws &amp;&amp; colcon build</code></td><td>退出码 + <code>&amp;&amp;</code></td></tr>
-    <tr><td>训练脚本跑了一夜，没人看着，成没成？</td><td>退出码</td></tr>
+    <tr><th>以后你会打出来的字</th><th>对应这张卡的哪一步</th></tr>
+    <tr><td><code>ros2 launch px4 ...</code> 一次拉起十几个节点</td><td>第 2 步：找 <code>ros2</code> 这个程序</td></tr>
+    <tr><td><code>ros2: command not found</code></td><td>第 2 步断了 —— 十有八九是没 <code>source</code> 环境（②B 讲）</td></tr>
+    <tr><td><code>Error: file not found: model.sdf</code></td><td>第 4 步断了 —— Gazebo 跑起来了，但模型文件路径不对</td></tr>
   </table>
-  <p><strong>为什么这跟你有关：</strong>以后你写的第一条正式命令，多半是 <code>source /opt/ros/humble/setup.bash</code>。它干的事就是<strong>往 PATH 里加目录</strong>——今天这张卡你不懂，那天就只能照抄。</p>
+  <p><strong>为什么这跟你有关：</strong>以后你在仿真里调半天，一半时间会花在这两类报错上。能一眼分出"是找不到程序"还是"是找不到文件"，排查时间能从半小时降到两分钟。</p>
 </div>
 
-<h2>八、自测（先自己想，再点开）</h2>
+<h2>六、自测（先自己想，再点开）</h2>
 
 <details>
-  <summary>1. 终端和 shell 有什么区别？</summary>
-  <p>终端只负责收字、显示字，它不懂命令；shell 才负责看懂那行字、找到该跑的程序。</p>
+  <summary>1. 终端和 shell 的区别，一句话怎么说？</summary>
+  <p>终端只管收字和显示，一个字都不懂；shell 才看懂那行字、负责找程序并启动它。</p>
 </details>
 
 <details>
-  <summary>2. PATH 是什么？为什么它能让 <code>ls</code> 到处都能用？</summary>
-  <p>PATH 是 shell 搜程序的目录清单。<code>ls</code> 在本机某个 PATH 目录里，shell 每次都能翻到它，所以跟你在哪个目录无关。</p>
+  <summary>2. 敲一个根本不存在的命令，会有厨师上岗吗？</summary>
+  <p>不会。shell 在第 2 步就没找到程序，直接报 <code>command not found</code>，后面什么都没发生。</p>
 </details>
 
 <details>
-  <summary>3. 报 <code>command not found</code>，断在第几步？</summary>
-  <p>第 2 步：shell 在 PATH 里翻遍了也没找到这个程序，根本没到"建进程"那一步。</p>
+  <summary>3. 为什么"报错说的是命令还是文件"，能帮你判断断在哪？</summary>
+  <p>因为这两句话是不同角色喊出来的：第 2 步是 shell 在喊"没有这个命令"，第 4 步是程序在喊"没有这个文件"。</p>
 </details>
 
-<details>
-  <summary>4. 报 <code>No such file or directory</code>，断在第几步？</summary>
-  <p>通常在第 3 步之后：程序找到了、也跑起来了，但它按你给的路径（参数）去开文件，发现没有这个文件。</p>
-</details>
-
-<details>
-  <summary>5. 敲完一条命令，屏幕什么都没显示。它成功了吗？</summary>
-  <p>不知道。要敲 <code>echo $?</code> 看退出码：0 是成功，非 0 是失败。屏幕上没字，什么也说明不了。</p>
-</details>
-
-<details>
-  <summary>6. <code>命令A &amp;&amp; 命令B</code> 里，A 失败了，B 会跑吗？</summary>
-  <p>不会。<code>&amp;&amp;</code> 的意思就是"A 交出 0 才轮到 B"，A 失败就直接停。</p>
-</details>
-
-<h2>九、答题区</h2>
-<p class="hint">写完点 <strong>「提交到云端」</strong>，下次开课我直接读。提交不了再点「复制」贴回对话框。答案同时存在你手机本地，刷新不会丢。</p>
+<h2>七、答题区</h2>
+<p class="hint">写完点 <strong>「提交到云端」</strong>，下次开课我直接读。答不完整没关系，<strong>写"我不确定"也比空着好</strong>。</p>
 
 <div class="answer-box">
-  <label>Q1. 一条命令从按回车到屏幕出结果，经过哪三个角色？各干什么？</label>
-  <textarea id="q1" placeholder="终端… / shell… / 进程…"></textarea>
+  <label>Q1. 用「取号机 / 服务生 / 厨师」这套说法，说清终端、shell、程序各干什么。别背名词，讲你自己的话。</label>
+  <textarea id="q1" placeholder="取号机… 服务生… 厨师…"></textarea>
 </div>
 
 <div class="answer-box">
-  <label>Q2. 为什么 <code>ls</code> 在哪个目录下都能用，而 <code>python 进度.md</code> 里的 <code>进度.md</code> 必须写对位置？</label>
-  <textarea id="q2" placeholder="因为第一个词…，第二个词…"></textarea>
+  <label>Q2. 你敲了 <code>python3 实验.py</code>，屏幕回 <code>python3: command not found</code>。断在第几步？此刻有没有进程在跑？</label>
+  <textarea id="q2" placeholder="断在第…步，因为…；有没有进程…"></textarea>
 </div>
 
 <div class="answer-box">
-  <label>Q3. <code>where python</code> 里，第一个词和第二个词分别是什么角色？</label>
-  <textarea id="q3" placeholder="第一个词是…，第二个词是…"></textarea>
+  <label>Q3. 你敲 <code>gazebo world.sdf</code>，Gazebo 界面弹出来了，但报 <code>file not found: world.sdf</code>。断在第几步？和上一题的区别是什么？</label>
+  <textarea id="q3" placeholder="断在第…步；区别是…"></textarea>
 </div>
 
 <div class="answer-box">
-  <label>Q4. 敲一个压根不存在的命令，报错发生在四步里的哪一步？为什么？</label>
-  <textarea id="q4" placeholder="第…步，因为…"></textarea>
-</div>
-
-<div class="answer-box">
-  <label>变式题. 如果两个 PATH 目录里各有一个同名的程序，shell 会跑哪个？为什么？</label>
-  <textarea id="q5" placeholder="会跑…，因为…"></textarea>
-</div>
-
-<div class="answer-box">
-  <label>Q5. 你昨晚跑了一个训练脚本，今早屏幕上一个字都没有。怎么判断它跑成功了？</label>
-  <textarea id="q6" placeholder="敲…，看到…说明…"></textarea>
+  <label>Q4（变式）. 你把终端窗口直接叉掉了，刚才那条还在跑的命令会怎样？想想三个角色里谁是"窗口"，谁不是。</label>
+  <textarea id="q4" placeholder="会…，因为叉掉的是…"></textarea>
 </div>
 
 <div class="btn-row">
@@ -196,37 +152,34 @@
 <p class="hint" id="msg"></p>
 
 <div class="todo">
-  <h2>下一步：电脑上做</h2>
-  <p>只做一件事，命令自己敲，<strong>先猜再敲</strong>：</p>
+  <h2>这张卡的电脑任务（留到周六上机时段）</h2>
+  <p>别现在做，<strong>周六 20:00 统一做</strong>。先记着要做什么：</p>
   <ul>
-    <li>查一下 <code>python</code> 到底住在哪个目录（Windows 用 <code>where python</code>）</li>
-    <li>敲之前先猜：它打印出来的路径，会不会在你当前目录里？</li>
-    <li>如果 <code>where</code> 说找不到，别急着重装，先想：是没装，还是没进 PATH？</li>
+    <li>随便敲一个不存在的命令（比如 <code>abcxyz</code>），看报错原文，判断断在第几步</li>
+    <li>再敲一个存在但文件写错的命令，对比两条报错的区别</li>
   </ul>
 </div>
 
-<p class="foot">答完提交，这张就算过。没提交 = 没答。</p>
+<p class="foot">这张只考"谁在干活"，别去想 PATH</p>
 
 <script>
-const ids = ['q1','q2','q3','q4','q5','q6'];
+const ids = ['q1','q2','q3','q4'];
 const labels = {
-  q1: 'Q1 三个角色',
-  q2: 'Q2 程序名 vs 参数',
-  q3: 'Q3 where python 拆词',
-  q4: 'Q4 报错断在哪一步',
-  q5: '变式题（同名程序）',
-  q6: 'Q5 退出码'
+  q1: 'Q1 三个角色（自己的话）',
+  q2: 'Q2 command not found 断在哪',
+  q3: 'Q3 file not found 断在哪 + 区别',
+  q4: '变式：叉掉终端窗口'
 };
 
 ids.forEach(id => {
   const el = document.getElementById(id);
-  const saved = localStorage.getItem('w1b_' + id);
+  const saved = localStorage.getItem('w1ba_' + id);
   if (saved) el.value = saved;
-  el.addEventListener('input', () => localStorage.setItem('w1b_' + id, el.value));
+  el.addEventListener('input', () => localStorage.setItem('w1ba_' + id, el.value));
 });
 
 function gen() {
-  let text = '【第 1 周补充 · 一条命令怎么跑】答题卡\n\n';
+  let text = '【第 1 周 · ②A 一条命令怎么跑起来】答题卡\n\n';
   ids.forEach(id => {
     const v = document.getElementById(id).value.trim();
     text += labels[id] + '：\n' + (v || '（没写）') + '\n\n';
@@ -261,12 +214,11 @@ function clearAll() {
   if (!confirm('清空所有答案？')) return;
   ids.forEach(id => {
     document.getElementById(id).value = '';
-    localStorage.removeItem('w1b_' + id);
+    localStorage.removeItem('w1ba_' + id);
   });
   document.getElementById('out').value = '';
   document.getElementById('msg').textContent = '已清空。';
 }
-
 </script>
 
 <script src="config.js"></script>

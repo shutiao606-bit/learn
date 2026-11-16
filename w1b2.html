@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>第 1 周 · ②B 它凭什么找得到</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html">← 主页</a>
+  <span class="where">第 1 周 · ②B</span>
+</header>
+
+<h1>②B 它凭什么找得到</h1>
+<p class="sub">PATH、程序名、参数、退出码 ｜ 11/18 · 第 3 张</p>
+
+<div class="card">
+  <p>②A 讲清了"服务生去找厨师"。这张只回答一个问题：<strong>服务生去哪找？凭什么找得到？</strong></p>
+</div>
+
+<h2>一、两个现象，一个原因</h2>
+<div class="card">
+  <p><strong>现象一：</strong><code>ls</code>（Windows 上是 <code>dir</code>）你在<strong>任何目录下敲都能用</strong>。</p>
+  <p><strong>现象二：</strong><code>python 进度.md</code> 换个目录敲，就报"找不到文件"。</p>
+  <p>同一条命令里的两半，规矩完全不一样：</p>
+  <table>
+    <tr><th></th><th>去哪找</th><th>跟你站在哪有关吗</th></tr>
+    <tr><td><strong>第一个词</strong>（程序名）</td><td>去 <code>PATH</code> 清单里的目录逐个找</td><td><strong>无关</strong></td></tr>
+    <tr><td><strong>后面的词</strong>（参数）</td><td>按<strong>当前目录</strong>或你写的路径找</td><td><strong>完全有关</strong></td></tr>
+  </table>
+</div>
+
+<div class="analogy">
+  <strong>一句话：</strong>程序名靠「通讯录」找，参数靠「你现在站哪儿」找。
+</div>
+
+<h2>二、PATH 是什么</h2>
+<div class="card">
+  <p><code>PATH</code> 就是一串目录名，shell 拿着它<strong>按顺序</strong>挨个翻，翻到就停。</p>
+  <p>它是电脑里的<strong>通讯录</strong>：名字在里面，报个名就能联系上；不在里面，你得写清楚"他住哪"（完整路径）才行。</p>
+  <p class="hint">所以"装了软件却用不了"，绝大多数不是没装，是<strong>装的位置没写进这张通讯录</strong>。</p>
+</div>
+
+<h2>三、命令 = 程序名 + 参数</h2>
+<div class="card">
+  <p>把一行命令拆开看：</p>
+  <table>
+    <tr><th>你敲的</th><th>程序名</th><th>参数</th></tr>
+    <tr><td><code>python 实验.py</code></td><td><code>python</code></td><td><code>实验.py</code></td></tr>
+    <tr><td><code>cd D:\研究生</code></td><td><code>cd</code></td><td><code>D:\研究生</code></td></tr>
+    <tr><td><code>ros2 topic list</code></td><td><code>ros2</code></td><td><code>topic</code>、<code>list</code></td></tr>
+  </table>
+  <p>带 <code>-</code> 或 <code>--</code> 的参数叫<strong>选项</strong>，是给程序的一种"要求"：<code>ls -l</code> 里的 <code>-l</code> 意思是"列详细一点"。</p>
+</div>
+
+<div class="analogy">
+  点菜：<strong>菜名</strong>（程序名）后厨必须有；<strong>少冰、大杯</strong>（参数）是这道菜的做法要求。<br>
+  后厨没有的菜，写多少要求都没用——这就是 <code>command not found</code>。
+</div>
+
+<h2>四、怎么做：亲自问 shell</h2>
+<div class="card">
+  <p>想知道 shell 从哪儿找到某个程序，直接问它：</p>
+  <table>
+    <tr><th>系统</th><th>查程序在哪</th><th>看通讯录</th></tr>
+    <tr><td>Windows</td><td><code>where python</code></td><td><code>echo %PATH%</code></td></tr>
+    <tr><td>Linux / WSL</td><td><code>which python3</code></td><td><code>echo $PATH</code></td></tr>
+  </table>
+  <p><strong>如果 <code>where python</code> 打印出好几行</strong>——说明通讯录里有好几个同名的人，shell 会用<strong>第一个</strong>。</p>
+</div>
+
+<h2>五、命令跑完，成没成？——退出码</h2>
+<div class="card">
+  <p>很多命令跑完屏幕一个字都不出。那你凭什么判断它成功了？</p>
+  <p>凭<strong>退出码</strong>：每个进程结束时会交给 shell 一个数字。</p>
+  <ul>
+    <li><code>0</code> —— <strong>成功</strong></li>
+    <li><strong>非 0</strong> —— 失败，不同数字代表不同原因</li>
+  </ul>
+  <p>反直觉的地方：<strong>屏幕上没字 ≠ 成功</strong>。有的程序失败了也一声不吭，只在退出码里留个 1。</p>
+</div>
+
+<div class="analogy">
+  快递员送完货会回去交差：<strong>「送到了」</strong>（0）或 <strong>「家里没人」</strong>（非 0）。<br>
+  你不问，他也走了。
+</div>
+
+<div class="card">
+  <p><strong>怎么查：</strong>紧接着上一条命令敲下面这句：</p>
+  <table>
+    <tr><th>系统</th><th>命令</th></tr>
+    <tr><td>Linux / WSL</td><td><code>echo $?</code></td></tr>
+    <tr><td>Windows PowerShell</td><td><code>echo $LASTEXITCODE</code></td></tr>
+    <tr><td>Windows cmd</td><td><code>echo %errorlevel%</code></td></tr>
+  </table>
+  <p>日常还有一个用法：<code>命令A &amp;&amp; 命令B</code> —— 只有 A 返回 0，B 才会跑。</p>
+</div>
+
+<h2>六、以后在无人机里怎么用</h2>
+<div class="card">
+  <table>
+    <tr><th>以后你会打出来的字</th><th>这张卡的哪一块</th></tr>
+    <tr><td><code>source /opt/ros/humble/setup.bash</code></td><td><strong>往 PATH 里加目录</strong>——这条命令干的就是这件事</td></tr>
+    <tr><td><code>ros2: command not found</code></td><td>PATH 里还没有 ros2，说明你忘了 source</td></tr>
+    <tr><td><code>cd ws &amp;&amp; colcon build</code></td><td>退出码 + <code>&amp;&amp;</code></td></tr>
+    <tr><td>训练脚本跑了一夜没人看，成没成？</td><td>退出码，不是"屏幕没报错"</td></tr>
+  </table>
+  <p><strong>为什么这跟你有关：</strong>你以后每天开工的第一条命令，多半就是 <code>source</code>。它不神秘——就是<strong>把新目录加进通讯录</strong>。</p>
+</div>
+
+<h2>七、自测（先自己想，再点开）</h2>
+
+<details>
+  <summary>1. 为什么 <code>ls</code> 在哪都能用，<code>python 进度.md</code> 却不行？</summary>
+  <p><code>ls</code> 是程序名，在 PATH 里，跟你在哪无关；<code>进度.md</code> 是参数，按当前目录算，换个目录就指错了。</p>
+</details>
+
+<details>
+  <summary>2. 两个 PATH 目录里各有一个同名程序，跑哪个？</summary>
+  <p>按 PATH 里的顺序，<strong>排在前面的那个</strong>。shell 翻到就停，不会继续找。</p>
+</details>
+
+<details>
+  <summary>3. 装了 Python 却报 <code>command not found</code>，最可能的原因？</summary>
+  <p>装了，但它的安装目录没写进 PATH。这时候重装也没用，要改的是 PATH。</p>
+</details>
+
+<h2>八、答题区</h2>
+<p class="hint">写完点 <strong>「提交到云端」</strong>。不确定就写你猜的，<strong>猜错也比不猜有用</strong>——我知道你卡在哪才能补。</p>
+
+<div class="answer-box">
+  <label>Q1. <code>ros2 topic list</code> 这一行，哪个词是程序名、哪些是参数？分别去哪里找？</label>
+  <textarea id="q1" placeholder="程序名是…，去…找；参数是…，按…算"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q2. <code>where python</code> 打印出两行不同路径。这说明什么？实际会跑哪个？</label>
+  <textarea id="q2" placeholder="说明…；会跑…"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q3. 你用 <code>pip</code> 装了个新工具，敲它名字却报 <code>command not found</code>。最可能是什么问题？怎么验证（说一条命令）？</label>
+  <textarea id="q3" placeholder="最可能是…；我会敲…来验证"></textarea>
+</div>
+
+<div class="answer-box">
+  <label>Q4. 训练脚本跑了一夜，早上屏幕上什么都没有。你怎么判断它成没成？"屏幕没报错"为什么不算证据？</label>
+  <textarea id="q4" placeholder="我会…；因为…"></textarea>
+</div>
+
+<div class="btn-row">
+  <button onclick="gen()">生成答题卡</button>
+  <button class="secondary" onclick="copyOut()">复制</button>
+  <button class="secondary" onclick="clearAll()">清空</button>
+</div>
+
+<textarea id="out" placeholder="点「生成答题卡」，这里会出现可以复制的文字"></textarea>
+<p class="hint" id="msg"></p>
+
+<div class="todo">
+  <h2>这张卡的电脑任务（留到周六上机时段）</h2>
+  <ul>
+    <li>敲 <code>where python</code>，看它从哪个目录被找到的</li>
+    <li>敲 <code>echo %PATH%</code>，数一数通讯录里有几个目录</li>
+    <li>敲一条命令，然后立刻 <code>echo %errorlevel%</code>，看它交了几号</li>
+  </ul>
+</div>
+
+<p class="foot">通讯录里没有的名字，喊破喉咙也没人应</p>
+
+<script>
+const ids = ['q1','q2','q3','q4'];
+const labels = {
+  q1: 'Q1 拆 ros2 topic list',
+  q2: 'Q2 where python 两行',
+  q3: 'Q3 装了却找不到',
+  q4: 'Q4 退出码判断成败'
+};
+
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  const saved = localStorage.getItem('w1bb_' + id);
+  if (saved) el.value = saved;
+  el.addEventListener('input', () => localStorage.setItem('w1bb_' + id, el.value));
+});
+
+function gen() {
+  let text = '【第 1 周 · ②B 它凭什么找得到】答题卡\n\n';
+  ids.forEach(id => {
+    const v = document.getElementById(id).value.trim();
+    text += labels[id] + '：\n' + (v || '（没写）') + '\n\n';
+  });
+  const out = document.getElementById('out');
+  out.value = text;
+  document.getElementById('msg').textContent = '已生成，点「提交到云端」；不行再点「复制」。';
+}
+
+function copyOut() {
+  const out = document.getElementById('out');
+  if (!out.value) { gen(); }
+  const msg = document.getElementById('msg');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(out.value).then(
+      () => msg.textContent = '已复制，去对话框粘贴。',
+      () => { out.select(); msg.textContent = '请长按上面的框手动复制。'; }
+    );
+  } else {
+    out.select();
+    out.setSelectionRange(0, 99999);
+    try {
+      document.execCommand('copy');
+      msg.textContent = '已复制，去对话框粘贴。';
+    } catch (e) {
+      msg.textContent = '请长按上面的框手动复制。';
+    }
+  }
+}
+
+function clearAll() {
+  if (!confirm('清空所有答案？')) return;
+  ids.forEach(id => {
+    document.getElementById(id).value = '';
+    localStorage.removeItem('w1bb_' + id);
+  });
+  document.getElementById('out').value = '';
+  document.getElementById('msg').textContent = '已清空。';
+}
+</script>
+
+<script src="config.js"></script>
+<script src="net.js"></script>
+<script src="submit.js"></script>
+
+<script src="nav.js"></script>
+</body>
+</html>

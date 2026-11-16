@@ -4,7 +4,8 @@
   var CARDS = [
     { f: 'w1a.html', n: '⓪', t: '开课：这一周怎么学' },
     { f: 'w1.html',  n: '①', t: '路径与目录' },
-    { f: 'w1b.html', n: '②', t: '一条命令怎么跑' },
+    { f: 'w1b.html',  n: '②', t: '②A 三个角色' },
+    { f: 'w1b2.html', n: '②', t: '②B 凭什么找得到' },
     { f: 'w1c.html', n: '③', t: '进程是什么' },
     { f: 'w1d.html', n: '④', t: 'Windows vs Linux 路径' },
     { f: 'w1e.html', n: '⑤', t: '电脑实操' },
