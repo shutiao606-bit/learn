@@ -83,7 +83,9 @@
     var src = fresh.length ? fresh : pool;
     current = src[Math.floor(Math.random() * src.length)];
     qEl.textContent = current.q;
-    metaEl.textContent = current.num + ' ' + current.card;
+    var lvName = { s: '必会', a: '该懂', b: '知道', c: '可跳' }[current.lv || 's'];
+    metaEl.innerHTML = '<span class="lv lv-' + (current.lv || 's') + '">' + lvName +
+      '</span> ' + current.num + ' ' + current.card;
     metaEl.style.display = '';
     timerCard.style.display = 'none';
     rateCard.style.display = 'none';

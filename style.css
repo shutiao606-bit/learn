@@ -1035,3 +1035,30 @@ button.secondary {
 .fb.fix .fb-tag { background: #c92a2a; }
 .fb.wait .fb-tag { background: #b98a3c; }
 .fb-note { margin: 0; font-size: .95em; line-height: 1.7; }
+
+/* ---------- 知识点优先级徽章 ---------- */
+.lv {
+  display: inline-block;
+  padding: 1px 7px;
+  margin-right: 4px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.7;
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+.lv-s { background: #c92a2a; color: #fff; }
+.lv-a { background: #e8590c; color: #fff; }
+.lv-b { background: #b98a3c; color: #fff; }
+.lv-c { background: var(--line); color: var(--muted); }
+.lv-sum {
+  margin: calc(var(--s1) * -1) 0 var(--s3);
+  font-size: .9em;
+  color: var(--muted);
+}
+@media (prefers-color-scheme: dark) {
+  .lv-s { background: #ff6b6b; color: #1a1a1a; }
+  .lv-a { background: #ffa94d; color: #1a1a1a; }
+  .lv-b { background: #f0c674; color: #1a1a1a; }
+}

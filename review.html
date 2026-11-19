@@ -72,7 +72,10 @@
         '<button type="button" class="rv-save">保存这次的答案</button>' +
       '</div>';
 
-    wrap.querySelector('.rv-q').textContent = b.q;
+    var lvName = { s: '必会', a: '该懂', b: '知道', c: '可跳' }[b.lv || 's'];
+    wrap.querySelector('.rv-q').innerHTML =
+      '<span class="lv lv-' + (b.lv || 's') + '">' + lvName + '</span> ';
+    wrap.querySelector('.rv-q').appendChild(document.createTextNode(b.q));
     wrap.querySelector('.cmp-old').textContent = old || '（当时没写）';
 
     var ta = wrap.querySelector('.rv-new');
