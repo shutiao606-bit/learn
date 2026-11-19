@@ -67,6 +67,17 @@
 </div>
 
 <h2>三、四步，一步不错</h2>
+<div class="flow">
+  <div class="flow-step" style="--d:0s"><b>① 终端 · 取号机</b><span>收下你敲的一整行字。它自己一个字都不懂</span></div>
+  <div class="flow-arrow">这一行字 ↓</div>
+  <div class="flow-step" style="--d:1.5s"><b>② shell · 服务生</b><span>拆成几个词，拿第一个词去找程序</span></div>
+  <div class="flow-arrow">找到程序，把它启动 ↓</div>
+  <div class="flow-step" style="--d:3s"><b>③ 程序 · 厨师</b><span>真正干活的那个。跑起来就是一个进程</span></div>
+  <div class="flow-arrow">结果写回屏幕 ↓</div>
+  <div class="flow-step dim" style="--d:4.5s"><b>屏幕</b><span>你看到的那一屏字</span></div>
+</div>
+<p class="figcap">这张图每 6 秒从上往下亮一遍：亮到哪一步，就是哪一步在干活。</p>
+
 <div class="card">
   <ol>
     <li><strong>回车</strong> —— 终端把这一整行字交给 shell</li>
@@ -91,6 +102,15 @@
 <div class="analogy">
   <strong>一句话记住：</strong>报错说的是"命令"，找的是<strong>服务生</strong>的麻烦；报错说的是"文件"，找的是<strong>厨师</strong>的麻烦。
 </div>
+
+<div class="flow flow-err">
+  <div class="flow-step"><b>① 终端</b><span>收下这行字</span></div>
+  <div class="flow-arrow">↓</div>
+  <div class="flow-step"><b>② shell 找程序</b><span>没找到 → 断在这里</span><span class="flow-x">command not found</span></div>
+  <div class="flow-arrow">↓ 找到了，启动</div>
+  <div class="flow-step"><b>③ 程序跑起来</b><span>要开的文件不在 / 不让动 → 断在这里</span><span class="flow-x">file / permission</span></div>
+</div>
+<p class="figcap">红标就是报错的位置。看它断在第几层，就知道该查什么。</p>
 
 <h2>五、以后在无人机里怎么用</h2>
 <div class="card">

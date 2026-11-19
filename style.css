@@ -1062,3 +1062,104 @@ button.secondary {
   .lv-a { background: #ffa94d; color: #1a1a1a; }
   .lv-b { background: #f0c674; color: #1a1a1a; }
 }
+
+/* ---------- 图解：命令流 ---------- */
+.flow {
+  display: flex;
+  flex-direction: column;
+  margin: var(--s3) 0;
+}
+.flow-step {
+  position: relative;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  animation: flowPulse 6s infinite;
+  animation-delay: var(--d, 0s);
+}
+.flow-step b { display: block; font-size: 1em; margin-bottom: 2px; }
+.flow-step span { font-size: .92em; color: var(--muted); }
+.flow-step code { font-size: .9em; }
+.flow-step.dim { opacity: .72; }
+
+@keyframes flowPulse {
+  0%, 72%, 100% { border-color: var(--line); box-shadow: none; }
+  8%, 26% { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, .13); }
+}
+
+.flow-arrow {
+  padding: 6px 0 6px 18px;
+  font-size: .88em;
+  color: var(--muted);
+  position: relative;
+}
+.flow-arrow::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--line);
+  border-radius: 2px;
+}
+
+.flow-x {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: .8em;
+  font-weight: 700;
+  color: #c92a2a;
+  background: rgba(201, 42, 42, .1);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-step { animation: none; }
+}
+
+/* ---------- 图解：程序 vs 进程 ---------- */
+.duo {
+  display: grid;
+  gap: var(--s3);
+  margin: var(--s3) 0;
+}
+@media (min-width: 560px) { .duo { grid-template-columns: 1fr 1fr; } }
+.duo-col {
+  padding: var(--s3);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+.duo-col h4 { margin: 0 0 6px; font-size: 1em; }
+.duo-col p { margin: 0; font-size: .93em; line-height: 1.7; }
+.duo-col.static { border-style: dashed; }
+.duo-col.live { border-color: var(--accent); }
+
+/* ---------- 图解：目录树 ---------- */
+.tree {
+  margin: var(--s3) 0;
+  padding: var(--s3);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.75;
+  overflow-x: auto;
+  white-space: pre;
+}
+.tree .hi { color: var(--accent); font-weight: 600; }
+.tree .mut { color: var(--muted); }
+
+/* ---------- 图示说明 ---------- */
+.figcap {
+  margin: calc(var(--s2) * -1) 0 var(--s3);
+  font-size: .88em;
+  color: var(--muted);
+}
